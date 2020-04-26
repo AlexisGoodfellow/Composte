@@ -9,6 +9,7 @@ sandbox/
 *.db
 logs/*
 */logs/*
+*.mypy_cache*
 
 data/
 lib/
