@@ -18,6 +18,7 @@ include/
 pip-selfcheck.json
 .__mypy_cache__/
 htmlcov/
+.coverage
 
 .repl_vars
 
