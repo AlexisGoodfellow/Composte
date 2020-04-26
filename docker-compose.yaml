@@ -1,0 +1,46 @@
+---
+version: '3.4'
+
+x-defaults: &defaults
+  image: "composte"
+  build:
+    dockerfile: ./docker/dev.dockerfile
+    context: .
+  environment:
+    PYENV_VERSION: "composte"
+    LC_ALL: 'en_US.UTF-8'
+    LANG: 'en_US.UTF-8'
+  command: /bin/bash
+  volumes:
+    - ./:/app
+
+services:
+  server:
+    <<: *defaults
+    build:
+      dockerfile: ./docker/prod.dockerfile
+      context: .
+    command: python composte/ComposteServer.py
+    volumes:
+      - ./:/app
+
+  # run tests & lints
+  test:
+    <<: *defaults
+    command: docker/run_tests.sh
+    build:
+      dockerfile: ./docker/dev.dockerfile
+      context: .
+    volumes:
+      - ./:/app
+
+  # Create an updated requirements.lock
+  lock-requirements:
+    <<: *defaults
+    entrypoint: /bin/bash
+    command: docker/lock_requirements.sh
+
+volumes:
+  home:
+  venv:
+    driver: local

@@ -2,23 +2,22 @@
 
 set -e
 
-eval "$(pyenv init -)"
-
-pyenv activate composte
-
 pytest tests --cov-report html
 
-echo "Running MyPy..."
+echo "Running MyPy"
 mypy .
 
-echo "Running black..."
-black --quiet wf_db tests*
+echo "Starting Black..."
+black --quiet composte tests
 
-echo "Running flake8..."
+echo "Starting flake8..."
 flake8 .
 
-echo "Running bandit..."
+echo "Starting bandit..."
 bandit -r .
 
-echo "Running iSort..."
+echo "Starting import sorting..."
 isort --recursive --apply .
+
+echo "Starting pydocstyle..."
+pydocstyle composte tests

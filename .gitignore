@@ -17,6 +17,7 @@ include/
 .Python
 pip-selfcheck.json
 .__mypy_cache__/
+htmlcov/
 
 .repl_vars
 
