@@ -18,5 +18,7 @@ RUN ln -fs /usr/local/bin/python3 /usr/local/bin/python
 RUN ln -fs /usr/local/bin/pip3 /usr/local/bin/pip
 RUN pip install --upgrade pip setuptools
 
-# Go back to app context
+# Go back to app context and copy in project files
 WORKDIR /app
+
+COPY . .
