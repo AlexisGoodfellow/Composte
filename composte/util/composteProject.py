@@ -3,7 +3,9 @@ import uuid
 import json
 import base64
 from network.base.exceptions import GenericError
+
 # from copy import deepcopy
+
 
 class ComposteProject:
     def __init__(self, metadata, parts=None, projectID=None):
@@ -19,8 +21,8 @@ class ComposteProject:
             s.insert(0.0, music21.key.KeySignature(0))
             s.insert(0.0, music21.meter.TimeSignature("4/4"))
             s.insert(0.0, music21.tempo.MetronomeMark("", 120, 1.0))
-            s.insert(0.0, music21.clef.clefFromString('treble'))
-            s.insert(0.0, music21.instrument.fromString('piano'))
+            s.insert(0.0, music21.clef.clefFromString("treble"))
+            s.insert(0.0, music21.instrument.fromString("piano"))
             self.parts = [s]
         if projectID is not None:
             self.projectID = projectID
@@ -33,8 +35,8 @@ class ComposteProject:
         s.insert(0.0, music21.key.keySignature(0))
         s.insert(0.0, music21.meter.TimeSignature("4/4"))
         s.insert(0.0, music21.tempo.MetronomeMark("", 120, 1.0))
-        s.insert(0.0, music21.clef.clefFromString('treble'))
-        s.insert(0.0, music21.instrument.fromString('piano'))
+        s.insert(0.0, music21.clef.clefFromString("treble"))
+        s.insert(0.0, music21.instrument.fromString("piano"))
         self.parts.append(s)
 
     def updateMetadata(self, fieldName, fieldValue):
@@ -46,8 +48,7 @@ class ComposteProject:
             it will affect is the order in which parts are presented on
             the GUI. firstPart and secondPart are both 0-indexed integers
             representing the indicies of the parts to swap. """
-        if (int(firstPart) < len(self.parts) and
-                int(secondPart) < len(self.parts)):
+        if int(firstPart) < len(self.parts) and int(secondPart) < len(self.parts):
             tmp = self.parts[firstPart]
             self.parts[firstPart] = self.parts[secondPart]
             self.parts[secondPart] = tmp
@@ -67,21 +68,21 @@ class ComposteProject:
             a ComposteProject. Intended to be stored in three
             discrete database fields. Returns a tuple containing the
             serialized JSON objects. """
-        bits = [ music21.converter.freezeStr(part) for part in self.parts ]
-        bytes_ = [ base64.b64encode(bit).decode() for bit in bits ]
+        bits = [music21.converter.freezeStr(part) for part in self.parts]
+        bytes_ = [base64.b64encode(bit).decode() for bit in bits]
         parts = json.dumps(bytes_)
         metadata = json.dumps(self.metadata)
         uuid = str(self.projectID)
         return (metadata, parts, uuid)
+
 
 def deserializeProject(serializedProject):
     """ Deserialize a serialized music21 composteProject
         into a composteProject object. """
     (metadata, parts, id_) = serializedProject
     bits = json.loads(parts)
-    bytes_ = [ base64.b64decode(bit.encode()) for bit in bits ]
-    parts = [ music21.converter.thawStr(byte) for byte in bytes_ ]
+    bytes_ = [base64.b64decode(bit.encode()) for bit in bits]
+    parts = [music21.converter.thawStr(byte) for byte in bytes_]
     metadata = json.loads(metadata)
     id_ = uuid.UUID(id_)
     return ComposteProject(metadata, parts, id_)
-

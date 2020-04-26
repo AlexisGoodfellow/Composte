@@ -5,10 +5,13 @@ built-in ABC functionality added unnecessary levels of complexity to the code
 to not use it.
 """
 
+
 class VirtualMethodError(NotImplementedError):
     """Raise in methods meant to be abstract methods when they are called."""
+
 
 def virtualmethod(fun):
     def virt(self, *args, **kwargs):
         raise VirtualMethodError(type(self).__name__ + "." + fun.__name__)
+
     return virt

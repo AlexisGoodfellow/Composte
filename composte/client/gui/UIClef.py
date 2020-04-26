@@ -3,7 +3,6 @@ from PyQt5 import QtWidgets
 
 
 class UIClef(QtWidgets.QGraphicsItem):
-
     def __init__(self, baseline: music21.pitch.Pitch, *args, **kwargs):
         """
         :param baseline: The pitch corresponding to the bottom line of the staff
@@ -27,11 +26,12 @@ class UIClef(QtWidgets.QGraphicsItem):
         """
         return pitch.diatonicNoteNum - self.__baseline.diatonicNoteNum
 
+
 # END class UIClef
 
 
 def treble():
-    return UIClef(music21.pitch.Pitch('E4'))
+    return UIClef(music21.pitch.Pitch("E4"))
 
 
 def fromMusic21(cl: music21.clef.Clef):
@@ -42,4 +42,4 @@ def fromMusic21(cl: music21.clef.Clef):
     if isinstance(cl, music21.clef.TrebleClef):
         return treble()
     else:
-        raise RuntimeError('Unsupported clef ' + cl)
+        raise RuntimeError("Unsupported clef " + cl)

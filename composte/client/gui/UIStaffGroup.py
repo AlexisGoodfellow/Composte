@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from client.gui.UIStaff import UIStaff
 import client.gui.UISettings as UISet
 
+
 class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
 
     """
@@ -9,8 +10,7 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
     measures.
     """
 
-    def __init__(self, canvas, measureLists, startMeasure, endMeasure,
-                 *args, **kwargs):
+    def __init__(self, canvas, measureLists, startMeasure, endMeasure, *args, **kwargs):
         """
         :param canvas: QGraphicsScene being used to manage the score view.
         :param measureLists: A list of lists of measures, each containing at
@@ -58,10 +58,10 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
         """
         for s in self.__staves:
             self.__canvas.removeItem(s)
-        self.__staves = [UIStaff(ml, self.__startMeasure, self.__endMeasure,
-                                 parent = self)
-                         for ml in self.__measureLists]
-
+        self.__staves = [
+            UIStaff(ml, self.__startMeasure, self.__endMeasure, parent=self)
+            for ml in self.__measureLists
+        ]
 
     def __updatePositions(self):
         """
@@ -73,7 +73,6 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
             h = s.boundingRect().height()
             s.setPos(0, y_offset)
             y_offset += y + h
-
 
     def boundingRect(self):
         """
@@ -87,7 +86,6 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
         y = childBoundRect.y()
         width = childBoundRect.width()
         height = childBoundRect.height()
-        return QtCore.QRectF(x,
-                             y - UISet.STAFF_GROUP_Y_PAD,
-                             width,
-                             height + 2 * UISet.STAFF_GROUP_Y_PAD)
+        return QtCore.QRectF(
+            x, y - UISet.STAFF_GROUP_Y_PAD, width, height + 2 * UISet.STAFF_GROUP_Y_PAD
+        )

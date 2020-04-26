@@ -5,14 +5,14 @@ import music21
 
 from protocol.base.exceptions import DeserializationFailure
 
+
 def serialize(status, *args):
     """
     Serialize messages sent to clients from the server as a list
     [ status, [ *args ] ]
     """
-    return json.dumps(
-        [status, [str(arg) for arg in args]]
-    )
+    return json.dumps([status, [str(arg) for arg in args]])
+
 
 def deserialize(msg):
     """
@@ -26,5 +26,5 @@ def deserialize(msg):
         raise DeserializationFailure("Received malformed data: {}".format(msg))
     return pythonObject
 
-# ==============================================================================
 
+# ==============================================================================

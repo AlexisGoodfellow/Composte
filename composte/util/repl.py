@@ -14,13 +14,17 @@ import json
 
 DEBUG = True
 
-class SyntaxError(Exception): pass
+
+class SyntaxError(Exception):
+    pass
+
 
 def I_dont_know_what_you_want_me_to_do(*args):
     """
     Unknown command
     """
     print("Unknown command")
+
 
 def _sleep(seconds):
     """
@@ -29,6 +33,7 @@ def _sleep(seconds):
     Sleep for some number of seconds
     """
     time.sleep(int(seconds))
+
 
 def _slice(start, stop, string):
     """
@@ -49,7 +54,10 @@ def _slice(start, stop, string):
     else:
         return string[start:end]
 
+
 hard_store = ".repl_vars"
+
+
 def _export(name, value):
     """
     export name value
@@ -72,6 +80,7 @@ def _export(name, value):
 
     return value
 
+
 def _import(name):
     """
     import name
@@ -90,6 +99,7 @@ def _import(name):
 
     return value
 
+
 def echo(*args):
     """
     echo [args...]
@@ -97,10 +107,13 @@ def echo(*args):
     Prints its arguments
     """
     args = [str(arg) for arg in args]
-    if DEBUG: str_ = ", ".join(list(args))
-    else: str_ = " ".join(args)
+    if DEBUG:
+        str_ = ", ".join(list(args))
+    else:
+        str_ = " ".join(args)
 
     return str_
+
 
 class REPL_env:
     """
@@ -108,6 +121,7 @@ class REPL_env:
     wanted to chain REPL bindings correctly, but I'm lazy and this is low
     priority.
     """
+
     def __init__(self):
         self.__bindings = {}
 
@@ -144,6 +158,7 @@ class REPL_env:
         except KeyError as e:
             return ""
 
+
 class repl_source:
     __max_depth = 500
 
@@ -159,8 +174,9 @@ class repl_source:
         command to evaluate.
         """
         if len(self.__fps) > self.__max_depth:
-            return ("source: max depth ({}) exceeded: not sourcing {}"
-                    .format(self.__max_depth, filename))
+            return "source: max depth ({}) exceeded: not sourcing {}".format(
+                self.__max_depth, filename
+            )
 
         try:
             fp = open(filename, "r")
@@ -194,6 +210,7 @@ class repl_source:
 
         return s
 
+
 def stop_repl_help(*args):
     """
     Stop-REPL
@@ -202,6 +219,7 @@ def stop_repl_help(*args):
     """
     # Exists to provide help for a REPL builtin
     pass
+
 
 def last_help(*args):
     """
@@ -212,6 +230,7 @@ def last_help(*args):
     # Exists to provide help for a REPL builtin
     pass
 
+
 def alias_help(*args):
     """
     alias oldname newname
@@ -220,7 +239,8 @@ def alias_help(*args):
     """
     pass
 
-def show_help(builtins, callbacks, fun = None, *args):
+
+def show_help(builtins, callbacks, fun=None, *args):
     """
     help [command]
 
@@ -236,12 +256,15 @@ def show_help(builtins, callbacks, fun = None, *args):
         fnames = callbacks.keys()
         builtins = builtins.keys()
         print(
-    """help [command]
+            """help [command]
 
 Display help about `command`. The following commands are available:
-""")
-        for fname in fnames: print(fname)
-        for builtin_name in builtins: print(builtin_name)
+"""
+        )
+        for fname in fnames:
+            print(fname)
+        for builtin_name in builtins:
+            print(builtin_name)
         return
 
     # Command level help
@@ -260,6 +283,7 @@ Display help about `command`. The following commands are available:
     doc = inspect.getdoc(target)
     print(doc)
 
+
 def merge_args(args):
     """
     Merge arguments separated by escaped whitespace
@@ -269,7 +293,8 @@ def merge_args(args):
     skip = 0
     collect = ""
     for arg in args:
-        if arg is None: return []
+        if arg is None:
+            return []
 
         if skip > 0:
             skip = skip - 1
@@ -290,9 +315,11 @@ def merge_args(args):
 
         new_args.append(collect)
 
-    if skip > 0: new_args.append(collect)
+    if skip > 0:
+        new_args.append(collect)
 
     return new_args
+
 
 def expand_vars(env, args):
     """
@@ -310,6 +337,7 @@ def expand_vars(env, args):
         new_args.append(arg)
 
     return new_args
+
 
 def split_args(args):
     new_args = []
@@ -330,6 +358,7 @@ def split_args(args):
 
     return new_args
 
+
 def quote(args):
     """
     Quote whitespace in arguments by escaping whitespace
@@ -343,9 +372,13 @@ def quote(args):
 
     return new_args
 
-def do_sub_repl_if_needed(callbacks,
-        default_function = I_dont_know_what_you_want_me_to_do,
-        prompt = lambda : ">>> ", args = None):
+
+def do_sub_repl_if_needed(
+    callbacks,
+    default_function=I_dont_know_what_you_want_me_to_do,
+    prompt=lambda: ">>> ",
+    args=None,
+):
     """
     Perform command substitution if necessary. `command args` will be replaced
     with the output of evaluating `command args`.
@@ -353,7 +386,8 @@ def do_sub_repl_if_needed(callbacks,
     For example, echo `echo a` prints a
     """
 
-    if args is None: return ""
+    if args is None:
+        return ""
 
     new_args = []
 
@@ -385,9 +419,13 @@ def do_sub_repl_if_needed(callbacks,
                 sub_command_args = quote(sub_command_args)
 
                 # Evaluate expression and get result
-                replacement = the_worst_repl_you_will_ever_see(callbacks,
-                        default_function, prompt, once = True,
-                        to_eval = [sub_command] + sub_command_args)
+                replacement = the_worst_repl_you_will_ever_see(
+                    callbacks,
+                    default_function,
+                    prompt,
+                    once=True,
+                    to_eval=[sub_command] + sub_command_args,
+                )
                 # Replace expression with result
                 new_args.append(replacement)
 
@@ -404,14 +442,19 @@ def do_sub_repl_if_needed(callbacks,
             new_args.append(arg)
 
     if started_subcommand:
-        raise SyntaxError("Unmatched \"`\"")
+        raise SyntaxError('Unmatched "`"')
 
     return new_args
 
-def the_worst_repl_you_will_ever_see(callbacks,
-        default_function = I_dont_know_what_you_want_me_to_do,
-        prompt = lambda : ">>> ", once = False, to_eval = None,
-        setup = []):
+
+def the_worst_repl_you_will_ever_see(
+    callbacks,
+    default_function=I_dont_know_what_you_want_me_to_do,
+    prompt=lambda: ">>> ",
+    once=False,
+    to_eval=None,
+    setup=[],
+):
     """
     Start an interactive REPL backed by callbacks
     { command-name: function-to-invoke }
@@ -444,8 +487,10 @@ def the_worst_repl_you_will_ever_see(callbacks,
     laps = 0
     while not done:
         if once:
-            if laps > 0: break
-            else: laps = laps + 1
+            if laps > 0:
+                break
+            else:
+                laps = laps + 1
 
         if to_eval is None and setup == []:
             try:
@@ -478,8 +523,7 @@ def the_worst_repl_you_will_ever_see(callbacks,
         args = split_args(args)
         args = expand_vars(env, args)
         try:
-            args = do_sub_repl_if_needed(callbacks, default_function, prompt,
-                    args)
+            args = do_sub_repl_if_needed(callbacks, default_function, prompt, args)
         except SyntaxError as e:
             print(str(e))
             continue
@@ -522,7 +566,8 @@ def the_worst_repl_you_will_ever_see(callbacks,
                 if str(e).startswith(alias.__name__):
                     fname, msg = str(e).split(" ", 1)
                     print("{} {}".format(command, msg))
-                else: print(str(e))
+                else:
+                    print(str(e))
                 continue
             if ret == "no-override":
                 print("alias: cannot override existing command")
@@ -552,11 +597,13 @@ def the_worst_repl_you_will_ever_see(callbacks,
             if str(e).startswith(exec_.__name__):
                 fname, msg = str(e).split(" ", 1)
                 print("{} {}".format(command, msg))
-            else: print(str(e))
+            else:
+                print(str(e))
             continue
 
-        if res is not None and not once: print(str(res))
-        if res is not None: res = str(res)
+        if res is not None and not once:
+            print(str(res))
+        if res is not None:
+            res = str(res)
 
     return res
-

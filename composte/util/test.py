@@ -11,6 +11,6 @@ note2.tie = music21.tie.Tie("stop")
 s.insert(0.0, note1)
 s.insert(1.0, note2)
 # Attempt to playback the stream
-music21.midi.realtime.StreamPlayer(s).play() # 2 notes play instead of 1
+music21.midi.realtime.StreamPlayer(s).play()  # 2 notes play instead of 1
 # Check the score in a GUI to make sure the tie is present
 s.show()

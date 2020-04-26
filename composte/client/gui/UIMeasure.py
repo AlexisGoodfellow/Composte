@@ -1,4 +1,3 @@
-
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsLineItem
@@ -7,20 +6,32 @@ from client.gui.UINote import UINote
 
 import music21
 
+
 class UIMeasure(QtWidgets.QGraphicsItemGroup):
 
     __stafflineWidth = 1
     __barlineWidth = 2
-    __stafflinePen = QtGui.QPen(QtGui.QBrush(Qt.black),
-                                __stafflineWidth,
-                                Qt.SolidLine, Qt.FlatCap)
-    __barlinePen = QtGui.QPen(QtGui.QBrush(Qt.black),
-                              __barlineWidth,
-                              Qt.SolidLine, Qt.FlatCap)
+    __stafflinePen = QtGui.QPen(
+        QtGui.QBrush(Qt.black), __stafflineWidth, Qt.SolidLine, Qt.FlatCap
+    )
+    __barlinePen = QtGui.QPen(
+        QtGui.QBrush(Qt.black), __barlineWidth, Qt.SolidLine, Qt.FlatCap
+    )
 
-    def __init__(self, scene, width, clef, keysig, timesig,
-                 newClef = False, newKeysig = False, newTimesig = False,
-                 forceDrawClef = False, *args, **kwargs):
+    def __init__(
+        self,
+        scene,
+        width,
+        clef,
+        keysig,
+        timesig,
+        newClef=False,
+        newKeysig=False,
+        newTimesig=False,
+        forceDrawClef=False,
+        *args,
+        **kwargs,
+    ):
         """
         :note: Most of the features related to drawing clef/keysig/timesig don't
         work correctly yet.
@@ -59,25 +70,26 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
         """
         Draw in staff and bar lines.
         """
-        for i in range(0,5):
-            line = QGraphicsLineItem(0, 2 * i * UISettings.PITCH_LINE_SEP,
-                                     self.__width,
-                                     2 * i * UISettings.PITCH_LINE_SEP,
-                                     self)
+        for i in range(0, 5):
+            line = QGraphicsLineItem(
+                0,
+                2 * i * UISettings.PITCH_LINE_SEP,
+                self.__width,
+                2 * i * UISettings.PITCH_LINE_SEP,
+                self,
+            )
             line.setPen(self.__stafflinePen)
             self.__baseObjs.append(line)
 
-        barline_y1 = -self.__stafflineWidth/2
-        barline_y2 = 4 * 2 * UISettings.PITCH_LINE_SEP + self.__stafflineWidth/2
+        barline_y1 = -self.__stafflineWidth / 2
+        barline_y2 = 4 * 2 * UISettings.PITCH_LINE_SEP + self.__stafflineWidth / 2
 
-        barline = QGraphicsLineItem(0, barline_y1,
-                                    0, barline_y2,
-                                    parent=self)
+        barline = QGraphicsLineItem(0, barline_y1, 0, barline_y2, parent=self)
         barline.setPen(self.__barlinePen)
         self.__baseObjs.append(barline)
-        barline = QGraphicsLineItem(self.__width, barline_y1,
-                                    self.__width, barline_y2,
-                                    parent = self)
+        barline = QGraphicsLineItem(
+            self.__width, barline_y1, self.__width, barline_y2, parent=self
+        )
         barline.setPen(self.__barlinePen)
         self.__baseObjs.append(barline)
 
@@ -127,14 +139,14 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
         note.setParentItem(self)
         self.__noteObjs[(pitch, ntype, offset)] = note
 
-        notesWidth = (self.__width
-                        - UISettings.BARLINE_FRONT_PAD
-                        - UISettings.BARLINE_REAR_PAD )
-        note_x = (UISettings.BARLINE_FRONT_PAD
-                    + notesWidth * (offset / (self.length() - 1)))
+        notesWidth = (
+            self.__width - UISettings.BARLINE_FRONT_PAD - UISettings.BARLINE_REAR_PAD
+        )
+        note_x = UISettings.BARLINE_FRONT_PAD + notesWidth * (
+            offset / (self.length() - 1)
+        )
         note_y = 0
         note.setPos(note_x, note_y)
-
 
     def deleteNote(self, pitch: music21.pitch.Pitch, offset: float):
         """
@@ -158,23 +170,29 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
     # Getters
     def clef(self):
         return self.__clef
+
     def keysig(self):
         return self.__keysig
+
     def timesig(self):
         return self.__timesig
+
     def width(self):
         return self.__width
 
     # Setters
-    def setClef(self, clef, newClef = True):
+    def setClef(self, clef, newClef=True):
         self.__clef = clef
         self.__newClef = newClef
-    def setKeysig(self, keysig, newKeysig = True):
+
+    def setKeysig(self, keysig, newKeysig=True):
         self.__keysig = keysig
         self.__newKeysig = newKeysig
-    def setTimesig(self, timesig, newTimesig = True):
+
+    def setTimesig(self, timesig, newTimesig=True):
         self.__timesig = timesig
         self.__newTimesig = newTimesig
+
     def setWidth(self, width):
         self.__width = width
         self.__redraw()

@@ -5,6 +5,7 @@ import music21
 
 from protocol.base.exceptions import DeserializationFailure
 
+
 def serialize(function_name, *args):
     """
     Serialize a message to be sent from client to server
@@ -13,12 +14,10 @@ def serialize(function_name, *args):
     args =:= type(list of str)
     """
 
-    rpc = {
-        "fName": function_name,
-        "args": [str(arg) for arg in args],
-    }
+    rpc = {"fName": function_name, "args": [str(arg) for arg in args]}
 
     return json.dumps(rpc)
+
 
 def deserialize(msg):
     """
@@ -34,5 +33,5 @@ def deserialize(msg):
         raise DeserializationFailure("Received malformed data: {}".format(msg))
     return pythonObject
 
-# ==============================================================================
 
+# ==============================================================================

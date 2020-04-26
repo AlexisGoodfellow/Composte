@@ -25,6 +25,7 @@ import sqlite3
 import logging
 import traceback
 
+
 class ComposteServer:
     __project_extension = ".heap"
     __metadata_extension = ".meta"
@@ -32,8 +33,14 @@ class ComposteServer:
     # I'm so sorry
     __register_lock = Lock()
 
-    def __init__(self, interactive_port, broadcast_port,
-            logger, encryption_scheme, data_root = "data/"):
+    def __init__(
+        self,
+        interactive_port,
+        broadcast_port,
+        logger,
+        encryption_scheme,
+        data_root="data/",
+    ):
         """
         Start a Composte Server listening on interactive_port and broadcasting
         on broadcast_port. Logs are directed to logger, messages are
@@ -42,14 +49,16 @@ class ComposteServer:
         data_root.
         """
 
-        self.__server = NetworkServer(interactive_port, broadcast_port,
-                logger, encryption_scheme)
+        self.__server = NetworkServer(
+            interactive_port, broadcast_port, logger, encryption_scheme
+        )
 
-        self.__server.start_background(self.__handle, self.__preprocess,
-                self.__postprocess)
+        self.__server.start_background(
+            self.__handle, self.__preprocess, self.__postprocess
+        )
 
-        self.__users        = None
-        self.__projects     = None
+        self.__users = None
+        self.__projects = None
         self.__contributors = None
 
         self.version = misc.get_version()
@@ -70,9 +79,9 @@ class ComposteServer:
             with self.__dlock:
                 return not self.__done
 
-        self.__timer = timer.every(300, 2,
-                lambda: self.__pool.map(self.flush_project),
-                lambda: is_done(self))
+        self.__timer = timer.every(
+            300, 2, lambda: self.__pool.map(self.flush_project), lambda: is_done(self)
+        )
 
         try:
             os.makedirs(self.__project_root)
@@ -128,7 +137,7 @@ class ComposteServer:
         success = auth.verify(pword, record.hash)
         if success:
             uuids = self.__contributors.get_projects(uname)
-            project_ids = [ str(uuid_) for uuid_ in uuids ]
+            project_ids = [str(uuid_) for uuid_ in uuids]
             return ("ok", json.dumps(project_ids))
         else:
             return ("fail", "failed to login")
@@ -151,8 +160,11 @@ class ComposteServer:
 
         self.write_project(proj)
 
-        self.__server.info("Creating project {} with name {} for {}".
-                format(id_, metadata["name"], uname))
+        self.__server.info(
+            "Creating project {} with name {} for {}".format(
+                id_, metadata["name"], uname
+            )
+        )
 
         try:
             self.__projects.put(id_, pname, uname)
@@ -205,16 +217,16 @@ class ComposteServer:
         """
         Retrieve a list of projects that a user is a collaborator on
         """
-        listings = self.__contributors.get(username = uname)
-        listings = [ str(project) for project in listings ]
+        listings = self.__contributors.get(username=uname)
+        listings = [str(project) for project in listings]
         return ("ok", json.dumps(listings))
 
     def list_contributors_of_project(self, pid):
         """
         Retrieve a list of a project's contributors
         """
-        listings = self.__contributors.get(project_id = pid)
-        listings = [ str(user) for user in listings ]
+        listings = self.__contributors.get(project_id=pid)
+        listings = [str(user) for user in listings]
         return ("ok", json.dumps(listings))
 
     def compare_versions(self, client_version):
@@ -273,9 +285,7 @@ class ComposteServer:
         with open(fullpath, "r") as f:
             parts = f.read()
 
-        project = composteProject.deserializeProject(
-            (metadata, parts, pid)
-        )
+        project = composteProject.deserializeProject((metadata, parts, pid))
         # Don't put it into the pool yet, because then we end up with a
         # use count that will never be 0 again
         return project
@@ -331,6 +341,7 @@ class ComposteServer:
 
         # Use this function to get a project
         pid_ = None
+
         def get_fun(pid):
             """
             Fetch a project from the cache
@@ -345,8 +356,7 @@ class ComposteServer:
         with self.__flushing:
             try:
                 # We still need to provide a way to get the project
-                reply = musicWrapper.performMusicFun(*args,
-                        fetchProject = get_fun)
+                reply = musicWrapper.performMusicFun(*args, fetchProject=get_fun)
             except:
                 print(traceback.format_exc())
                 return ("fail", "Internal Server Error")
@@ -363,15 +373,14 @@ class ComposteServer:
         cache
         """
         # Assert permission
-        contributors = self.__contributors.get(project_id = pid)
-        contributors = [ user.uname for user in contributors ]
+        contributors = self.__contributors.get(project_id=pid)
+        contributors = [user.uname for user in contributors]
         if username in contributors:
             self.__pool.put(pid, lambda: self.get_project(pid)[1])
             cookie = self.generate_cookie_for(username, pid)
             return ("ok", str(cookie))
         else:
-            self.__server.debug("{} is not one of {}".format(username,
-                contributors))
+            self.__server.debug("{} is not one of {}".format(username, contributors))
             return ("fail", "You are not a contributor")
 
     def unsubscribe(self, cookie):
@@ -387,8 +396,7 @@ class ComposteServer:
         (status, reason) = self.remove_cookie(cookie)
 
         if status == "ok":
-            project = self.__pool.put(project_id,
-                    lambda x: self.get_project(x)[1])
+            project = self.__pool.put(project_id, lambda x: self.get_project(x)[1])
             pid = project.projectID
             self.__pool.remove(pid, lambda x: self.write_project(x))
 
@@ -415,7 +423,7 @@ class ComposteServer:
         Add a new user to the list of contributors to a project
         """
 
-        contributors = self.__contributors.get(project_id = pid)
+        contributors = self.__contributors.get(project_id=pid)
         user = self.__users.get(new_contributor)
 
         # If that's not a known user, fail
@@ -475,8 +483,7 @@ class ComposteServer:
 
         # Only broadcast successful updates
         if f == "update" and status == "ok":
-            self.__server.broadcast(client.serialize(rpc["fName"],
-                *rpc["args"]))
+            self.__server.broadcast(client.serialize(rpc["fName"], *rpc["args"]))
 
         return (status, other)
 
@@ -507,24 +514,25 @@ class ComposteServer:
 
         self.__server.stop()
 
+
 def stop_server(sig, frame, server):
     """
     Signal handler to stop the server elegantly, especially under a supervisor
     """
     server.stop()
 
+
 if __name__ == "__main__":
     import signal
 
     import argparse
 
-    parser = argparse.ArgumentParser(prog = "ComposteServer",
-            description = "A Composte Server")
+    parser = argparse.ArgumentParser(
+        prog="ComposteServer", description="A Composte Server"
+    )
 
-    parser.add_argument("-i", "--interactive-port", default = 5000,
-            type = int)
-    parser.add_argument("-b", "--broadcast-port", default = 5001,
-            type = int)
+    parser.add_argument("-i", "--interactive-port", default=5000, type=int)
+    parser.add_argument("-b", "--broadcast-port", default=5001, type=int)
 
     args = parser.parse_args()
 
@@ -535,11 +543,14 @@ if __name__ == "__main__":
 
     real_log = Combined((log, StdErr))
 
-    s = ComposteServer("tcp://*:{}".format(args.interactive_port),
-            "tcp://*:{}".format(args.broadcast_port), real_log, Encryption())
+    s = ComposteServer(
+        "tcp://*:{}".format(args.interactive_port),
+        "tcp://*:{}".format(args.broadcast_port),
+        real_log,
+        Encryption(),
+    )
 
-    signal.signal(signal.SIGINT , lambda sig, f: stop_server(sig, f, s))
+    signal.signal(signal.SIGINT, lambda sig, f: stop_server(sig, f, s))
     signal.signal(signal.SIGQUIT, lambda sig, f: stop_server(sig, f, s))
     signal.signal(signal.SIGTERM, lambda sig, f: stop_server(sig, f, s))
-    signal.signal(signal.SIGHUP,  lambda sig, f: stop_server(sig, f, s))
-
+    signal.signal(signal.SIGHUP, lambda sig, f: stop_server(sig, f, s))
