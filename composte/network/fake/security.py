@@ -17,10 +17,7 @@ class Encryption:
 
 
 class Log:
-    """
-    Sample class that logs to a write()-able sink
-    """
-
+    """Sample class that logs to a write()-able sink."""
     def __init__(self, sink):
         self.__sink = sink
 

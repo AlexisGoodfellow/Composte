@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 
 import socket
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def lookup(name, port):
     """
-    Look up a lot information about a remote address. Probably does some sort
-    of DNS query.
+    Look up a lot information about a remote address.
+
+    Probably does some sort of DNS query.
     """
     ret = socket.getaddrinfo(name, port)
     return ret
 
 
 def ip(name, port=80):
-    """
-    Get the ip associated with a remote address
-    """
+    """Get the ip associated with a remote address."""
     return lookup(name, port)[0][4][0]
 
 
@@ -24,8 +26,8 @@ if __name__ == "__main__":
 
     for thing in things:
         for ahh in thing:
-            print(ahh)
-        print("=================")
+            logger.debug(ahh)
+        logger.debug("=================")
 
-    print("composte.me ==> " + ip("composte.me"))
-    print("google.com  ==> " + ip("google.com"))
+    logger.debug("composte.me ==> " + ip("composte.me"))
+    logger.debug("google.com  ==> " + ip("google.com"))

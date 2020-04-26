@@ -4,20 +4,15 @@ import json
 import shlex
 import subprocess
 import traceback
-import uuid
-from threading import Lock, Thread
 
-import music21
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.Qt import Q_ARG, Q_RETURN_ARG
-from PyQt5.QtCore import Qt
 
 import util.composteProject
 import util.musicFuns
 import util.musicWrapper
 from client import editor
 from network.base.exceptions import GenericError
-from network.base.loggable import DevNull, StdErr
+from network.base.loggable import StdErr
 from network.client import Client as NetworkClient
 from network.fake.security import Encryption
 from protocol import client, server
@@ -28,6 +23,7 @@ DEBUG = False
 
 
 class ComposteClient(QtCore.QObject):
+    """Client connecting to Composte Servers."""
 
     _updateGUI = QtCore.pyqtSignal(float, float, name="_updateGUI")
     _chatToGUI = QtCore.pyqtSignal(str, name="_chatToGUI")
@@ -42,13 +38,14 @@ class ComposteClient(QtCore.QObject):
         **kwargs,
     ):
         """
-        RPC host for connecting to Composte Servers. Connects to a server
-        listening at interactive_remote and broadcasting on on
+        RPC host for connecting to Composte Servers.
+
+        Connects to a server listening at interactive_remote and broadcasting on
         broadcast_remote. Logs are directed to logger, and messages are
         transparently encrypted and encrypted with
         encryption_scheme.encrypt() and decrypted with
         encryption_scheme.decrypt().
-        Broadcasts are handled with broadcast_handler
+        Broadcasts are handled with broadcast_handler.
         """
         super(ComposteClient, self).__init__(*args, **kwargs)
 
@@ -85,33 +82,26 @@ class ComposteClient(QtCore.QObject):
         self.__client.start_background(self.__handle)
 
     def project(self):
+        """Project getter."""
         return self.__project
 
     def pause_updates(self):
         """
-        Prevent incoming updates from being applied, queuing them up.  Blocks
+        Prevent incoming updates from being applied, queuing them up. Blocks
         until all updates currently being processed have completed.
         """
         self.__client.pause_background()
 
     def resume_update(self):
-        """
-        Apply queued updates and resume applying updates as they come in.
-        """
+        """Apply queued updates and resume applying updates as they come in."""
         self.__client.resume_background()
 
     def closeEditor(self):
-        """
-        To be run when the editor exits, to do cleanup that will allow it to be
-        relaunched later.
-        """
+        """When the editor exits, do cleanup to allow it to be relaunched later."""
         self.__editor = None
 
     def __updateGui(self, startOffset, endOffset):
-        """
-        Tell the GUI to update the section of the score between startOffset and
-        endOffset.
-        """
+        """Tell the GUI to update the score between startOffset and endOffset."""
         if self.__editor is not None:
             self._updateGUI.emit(startOffset, endOffset)
 
@@ -154,7 +144,7 @@ class ComposteClient(QtCore.QObject):
             print(e)
 
     def __do_update(self, *args):
-        project = lambda x: self.__project
+        project = self.project()
 
         try:
             return util.musicWrapper.performMusicFun(*args, fetchProject=project)
@@ -164,9 +154,7 @@ class ComposteClient(QtCore.QObject):
             return ("fail", "error")
 
     def __version_handshake(self):
-        """
-        Perform a version handshake with the remote Composte server
-        """
+        """Perform a version handshake with the remote Composte server."""
         msg = client.serialize("handshake", misc.get_version())
         reply = self.__client.send(msg)
         if DEBUG:
@@ -178,11 +166,7 @@ class ComposteClient(QtCore.QObject):
             raise GenericError(version)
 
     def register(self, uname, pword, email):
-        """
-        register username password email
-
-        Attempt to register a new user
-        """
+        """Attempt to register a new user's username password email."""
         msg = client.serialize("register", uname, pword, email)
         reply = self.__client.send(msg)
         if DEBUG:
@@ -194,11 +178,7 @@ class ComposteClient(QtCore.QObject):
     # shouldn't be able to. This isn't an issue for the minimum deliverable
     # for the course, but it is an issue in the long run
     def login(self, uname, pword):
-        """
-        login username password
-
-        Attempt to login as a user
-        """
+        """Attempt to login with a username and password."""
         msg = client.serialize("login", uname, pword)
         reply = self.__client.send(msg)
         # status, reason = reply
@@ -208,10 +188,9 @@ class ComposteClient(QtCore.QObject):
 
     def create_project(self, uname, pname, metadata):
         """
-        create-project username project-name metadata
+        Attempt to create a project.
 
-        Attempt to create a project. Metdata must have the form of a json
-        object, eg "{ "owner": username }"
+        Metadata must have the form of a json object, eg "{ "owner": username }".
         """
         if type(metadata) == str:
             metadata = json.loads(metadata)
@@ -228,35 +207,23 @@ class ComposteClient(QtCore.QObject):
             print(reply)
             return ("fail", "Mangled reply")
 
-    def share(self, pid, new_contributor):
-        """
-        share project-id new-contributor
-
-        Allow another person to contribute to your project
-        """
-        msg = client.serialize("share", pid, new_contributor)
+    def share(self, project_id, new_contributor):
+        """Allow another person to contribute to your project."""
+        msg = client.serialize("share", project_id, new_contributor)
         reply = self.__client.send(msg)
         if DEBUG:
             print(reply)
         return server.deserialize(reply)
 
     def retrieve_project_listings_for(self, uname):
-        """
-        list-projects username
-
-        Get a list of all projects this user is a collaborator on
-        """
+        """.Get a list of all projects this user is a collaborator on."""
         msg = client.serialize("list_projects", uname)
         reply = self.__client.send(msg)
         return server.deserialize(reply)
 
-    def get_project(self, pid):
-        """
-        get-project project-id
-
-        Given a uuid, get the project to work on
-        """
-        msg = client.serialize("get_project", pid)
+    def get_project(self, project_id):
+        """Given a uuid, get the project to work on."""
+        msg = client.serialize("get_project", project_id)
         reply = server.deserialize(self.__client.send(msg))
         if DEBUG:
             print(reply)
@@ -269,13 +236,9 @@ class ComposteClient(QtCore.QObject):
 
     # Realistically, we send a login cookie and the server determines the user
     # from that, but we don't have that yet
-    def subscribe(self, uname, pid):
-        """
-        subscribe username project-id
-
-        Subscribe to updates to a project
-        """
-        msg = client.serialize("subscribe", uname, pid)
+    def subscribe(self, uname, project_id):
+        """Subscribe to updates to a project."""
+        msg = client.serialize("subscribe", uname, project_id)
         reply = self.__client.send(msg)
         # print(reply)
         j = json.loads(reply)
@@ -284,9 +247,7 @@ class ComposteClient(QtCore.QObject):
         return server.deserialize(reply)
 
     def unsubscribe(self, cookie):
-        """
-        Unsubscribe to updates to a project
-        """
+        """Unsubscribe to updates to a project."""
         msg = client.serialize("unsubscribe", cookie)
         reply = self.__client.send(msg)
         if DEBUG:
@@ -294,29 +255,26 @@ class ComposteClient(QtCore.QObject):
         return server.deserialize(reply)
 
     # There's nothing here yet b/c we don't know what anything look like
-    def update(self, pid, fname, args, partIndex=None, offset=None):
+    def update(self, project_id, fname, args, partIndex=None, offset=None):
         """
-        update project-id update-type args partIndex = None offset = None
+        Send a music related update for the remote backend to process.
 
-        Send a music related update for the remote backend to process. args is
-        a tuple of arguments
+        args is a tuple of arguments.
         """
         args = json.dumps(args)
-        msg = client.serialize("update", pid, fname, args, partIndex, offset)
+        msg = client.serialize("update", project_id, fname, args, partIndex, offset)
         reply = self.__client.send(msg)
         if DEBUG:
             print(reply)
         return server.deserialize(reply)
 
-    def chat(self, pid, from_, *message_parts):
-        """
-        chat project-id sender [message-parts]
-        """
-        return self.update(pid, "chat", (from_, " ".join(message_parts)))
+    def chat(self, project_id, from_, *message_parts):
+        """Send a message in the chat window."""
+        return self.update(project_id, "chat", (from_, " ".join(message_parts)))
 
     def toggleTTS(self):
         """
-        toggle-tts
+        Toggle the text-to=speech option.
 
         If text-to-speech is turned on, toggle-tts turns it off.
         If text-to-speech is turned off, toggle-tts turns it on.
@@ -325,157 +283,97 @@ class ComposteClient(QtCore.QObject):
         self.__tts = not self.__tts
 
     def ttsOn(self):
-        """
-        tts-on
-
-        Turns text-to-speech on if it is availible.
-        """
+        """Turns text-to-speech on if it is availible."""
         self.__tts = True
 
     def ttsOff(self):
-        """
-        tts-off
-
-        Turns text-to-speech off.
-        """
+        """Turns text-to-speech off."""
         self.__tts = False
 
-    def changeKeySignature(self, pid, offset, partIndex, newSigSharps):
-        """
-        change-key-signature project-id offset partIndex newSigSharps
-
-        Change the key signature
-        """
+    def changeKeySignature(self, project_id, offset, partIndex, newSigSharps):
+        """Change the key signature of a given part."""
         return self.update(
-            pid,
+            project_id,
             "changeKeySignature",
             (offset, partIndex, newSigSharps),
             partIndex,
             offset,
         )
 
-    def insertNote(self, pid, offset, partIndex, pitch, duration):
-        """
-        insert-note project-id offset partIndex pitch duration
-
-        Insert a note into the score
-        """
+    def insertNote(self, project_id, offset, partIndex, pitch, duration):
+        """Insert a note into the score."""
         return self.update(
-            pid, "insertNote", (offset, partIndex, pitch, duration), partIndex, offset
+            project_id, "insertNote", (offset, partIndex, pitch, duration), partIndex, offset
         )
 
-    def removeNote(self, pid, offset, partIndex, removedNoteName):
-        """
-        remove-note project-id offset partIndex removedNoteName
-
-        Remove a note from the score
-        """
+    def removeNote(self, project_id, offset, partIndex, removedNoteName):
+        """Remove a note from the score."""
         return self.update(
-            pid, "removeNote", (offset, partIndex, removedNoteName), partIndex, offset
+            project_id, "removeNote", (offset, partIndex, removedNoteName), partIndex, offset
         )
 
-    def insertMetronomeMark(self, pid, offset, bpm):
-        """
-        insert-metronome-mark project-id offset bpm pulseDuration
+    def insertMetronomeMark(self, project_id, offset, bpm):
+        """Insert a metronome mark into the score."""
+        return self.update(project_id, "insertMetronomeMark", (offset, bpm), None, offset)
 
-        Insert a metronome mark
-        """
-        return self.update(pid, "insertMetronomeMark", (offset, bpm), None, offset)
+    def removeMetronomeMark(self, project_id, offset):
+        """Remove a metronome mark from the score."""
+        return self.update(project_id, "removeMetronomeMark", (offset,), None, offset)
 
-    def removeMetronomeMark(self, pid, offset):
-        """
-        remove-metronome-mark project-id offset
+    def transpose(self, project_id, partIndex, semitones):
+        """Transpose a part by an integer number of semitones."""
+        return self.update(project_id, "transpose", (partIndex, semitones), partIndex, None)
 
-        Remove a metronome mark
-        """
-        return self.update(pid, "removeMetronomeMark", (offset,), None, offset)
-
-    def transpose(self, pid, partIndex, semitones):
-        """
-        transpose project-id partIndex semitones
-
-
-        """
-        return self.update(pid, "transpose", (partIndex, semitones), partIndex, None)
-
-    def insertClef(self, pid, offset, partIndex, clefStr):
-        """
-        insert-clef project-id offset partIndex clefStr
-
-        Insert a clef
-        """
+    def insertClef(self, project_id, offset, partIndex, clefStr):
+        """Insert a clef into the score."""
         return self.update(
-            pid, "insertClef", (offset, partIndex, clefStr), partIndex, offset
+            project_id, "insertClef", (offset, partIndex, clefStr), partIndex, offset
         )
 
-    def removeClef(self, pid, offset, partIndex):
-        """
-        remove-clef project-id offset partIndex
+    def removeClef(self, project_id, offset, partIndex):
+        """Remove a clef from the score."""
+        return self.update(project_id, "removeClef", (offset, partIndex), partIndex, offset)
 
-        Remove a clef
-        """
-        return self.update(pid, "removeClef", (offset, partIndex), partIndex, offset)
-
-    def insertMeasures(self, pid, insertionOffset, partIndex, insertedQLs):
-        """
-        insert-measures project-id insertionOffset partIndex insertedQLs
-
-        Insert measures into the score
-        """
+    def insertMeasures(self, project_id, insertionOffset, partIndex, insertedQLs):
+        """Insert measures into the score."""
         return self.update(
-            pid,
+            project_id,
             "insertMeasures",
             (insertionOffset, partIndex, insertedQLs),
             partIndex,
             insertionOffset,
         )
 
-    def addInstrument(self, pid, offset, partIndex, instrumentStr):
-        """
-        add-instrumnet project-id offset partIndex instrumentStr
-        """
+    def addInstrument(self, project_id, offset, partIndex, instrumentStr):
+        """Add an instrument to the score."""
         return self.update(
-            pid, "addInstrument", (offset, partIndex, instrumentStr), partIndex, offset
+            project_id, "addInstrument", (offset, partIndex, instrumentStr), partIndex, offset
         )
 
-    def removeInstrument(self, pid, offset, partIndex):
-        """
-        remove-instrument project-id offset partIndex
-        """
+    def removeInstrument(self, project_id, offset, partIndex):
+        """Remove an instrument from the score."""
         return self.update(
-            pid, "removeInstrument", (offset, partIndex), partIndex, offset
+            project_id, "removeInstrument", (offset, partIndex), partIndex, offset
         )
 
-    def addDynamic(self, pid, offset, partIndex, dynamicStr):
-        """
-        add-dynamic project-id offset partIndex dynamicStr
-        """
+    def addDynamic(self, project_id, offset, partIndex, dynamicStr):
+        """Add a dynamic marking to the score."""
         return self.update(
-            pid, "addDynamic", (offset, partIndex, dynamicStr), partIndex, offset
+            project_id, "addDynamic", (offset, partIndex, dynamicStr), partIndex, offset
         )
 
-    def removeDynamic(self, pid, offset, partIndex):
-        """
-        remove-dynamic project-id offset partIndex
-        """
-        return self.update(pid, "removeDynamic", (offset, partIndex), partIndex, offset)
+    def removeDynamic(self, project_id, offset, partIndex):
+        """Remove a dynamic marking from the score."""
+        return self.update(project_id, "removeDynamic", (offset, partIndex), partIndex, offset)
 
-    def addLyric(self, pid, offset, partIndex, lyric):
-        """
-        add-lyric project-id offset partIndex lyric
-
-        Attach a lyric to the score
-        """
+    def addLyric(self, project_id, offset, partIndex, lyric):
+        """Attach a lyric to the score."""
         return self.update(
-            pid, "addLyric", (offset, partIndex, lyric), partIndex, offset
+            project_id, "addLyric", (offset, partIndex, lyric), partIndex, offset
         )
 
     def startEditor(self):
-        """
-        start-editor
-
-        Launch the editor GUI.
-        """
+        """Launch the editor GUI."""
         if self.__project is not None:
             if self.__editor is None:
                 self.__editor = editor.Editor(self)
@@ -485,26 +383,18 @@ class ComposteClient(QtCore.QObject):
             return "Load a project before launching the editor."
 
     def playback(self, partIndex):
-        """
-        playback partIndex
-
-        Playback the project set by get-project.
-        """
+        """Playback a single part in the project."""
         self.pause_updates()
         util.musicFuns.playback(self.__project.parts[int(partIndex)])
         self.resume_update()
 
     def stop(self):
-        """
-        Stop the client elegantly
-        """
+        """Stop the client elegantly."""
         self.__client.stop()
 
 
 if __name__ == "__main__":
     import sys
-
-    from network import dns
 
     import argparse
 
