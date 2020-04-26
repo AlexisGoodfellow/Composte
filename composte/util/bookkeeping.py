@@ -1,7 +1,8 @@
 class Pool:
     """
-    Pool objects to hopefully reduce the number of copies floating around in
-    memory. Does some manual reference counting, which may be a bad idea.
+    Pool objects to hopefully reduce the number of copies floating around in memory.
+
+    Does some manual reference counting, which may be a bad idea.
     """
 
     __objects = {}

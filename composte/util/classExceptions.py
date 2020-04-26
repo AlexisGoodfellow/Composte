@@ -1,6 +1,7 @@
 """
-A module of exceptions for creating more readable abstract classes.  Python's
-built-in ABC functionality added unnecessary levels of complexity to the code
+A module of exceptions for creating more readable abstract classes.
+
+Python's built-in ABC functionality added unnecessary levels of complexity to the code
 (in large part because of the multiple-inheritance it introduced), so we decided
 to not use it.
 """

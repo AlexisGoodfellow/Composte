@@ -10,5 +10,5 @@ def hash(hashable):
 
 
 def verify(candidate, record):
-    """.Verify candidate against record."""
+    """Verify candidate against record."""
     return pbkdf2_sha256.verify(candidate, record)

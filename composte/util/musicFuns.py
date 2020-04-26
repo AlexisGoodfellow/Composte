@@ -1,3 +1,5 @@
+from typing import List
+
 import music21
 
 # TODO FOR FUTURE SELVES BEYOND COMP50:
@@ -28,9 +30,12 @@ import music21
 
 
 def changeKeySignature(offset, part, newSigSharps):
-    """ Changes the Key Signature at a given offset inside a part.
-        Must provide the correct number of sharps in the key signature
-        as an integer. Negative numbers correspond to the number of flats. """
+    """
+    Change the Key Signature at a given offset inside a part.
+
+    Must provide the correct number of sharps in the key signature
+    as an integer. Negative numbers correspond to the number of flats.
+    """
     newKeySig = music21.key.KeySignature(newSigSharps)
     oldKeySigs = part.getKeySignatures()
     for i in range(len(oldKeySigs)):
@@ -54,10 +59,12 @@ def changeKeySignature(offset, part, newSigSharps):
 
 
 def renameNotes(startOffset, part, keySig, endOffset=None):
-    """ Rename all notes affected by a key signature change
-        intelligently so as to not have sharp accidentals
-        in a flat key signature. Diffs need to accumulate
-        while the renaming is in process. """
+    """
+    Rename all notes affected by a key signature change.
+
+    We need to do this intelligently so as to not have sharp accidentals in a
+    flat key signature. Diffs need to accumulate while the renaming is in process.
+    """
     notes = part.notes
     hasSharps = 0 < keySig.sharps
     for note in notes:
@@ -70,8 +77,8 @@ def renameNotes(startOffset, part, keySig, endOffset=None):
                 part.replace(note, renameNote(note, hasSharps))
 
 
-def renameNote(note, hasSharps):
-    """ Rename a note intelligently within a key. """
+def renameNote(note: music21.note.Note, hasSharps: bool):
+    """Rename a note intelligently within a key."""
     # Have to create a NEW Note object to use replace. Reasons unclear.
     name = note.name
     octave = note.octave
@@ -100,10 +107,12 @@ def renameNote(note, hasSharps):
 
 
 # NOT IN MINIMUM DELIVERABLE
-def changeTimeSignature(offset, part, newSigStr):
-    """ Changes the Time Signature at a given offset inside a part.
-        newTimeSig must be a string representing the new time signature,
-        such as '4/4' or '6/8'. """
+def changeTimeSignature(offset: float, part: music21.part.Part, newSigStr: str):
+    """
+    Changes the Time Signature at a given offset inside a part.
+
+    newTimeSig must be a string for the new time signature, such as '4/4' or '6/8'.
+    """
     newTimeSig = music21.meter.TimeSignature(newSigStr)
     oldTimeSigs = part.getTimeSignatures()
     for oldTimeSig in oldTimeSigs:
@@ -114,13 +123,16 @@ def changeTimeSignature(offset, part, newSigStr):
     return part.getElementsByOffset(offset)
 
 
-def insertMetronomeMark(offset, parts, bpm):
-    """ Insert a metronome marking in a list of
-        parts at a given offset. The constructor needs 
-        staff text as a string (empty for our purposes), pulses per 
-        minute as an integer, and the duration in quarterLengths 
-        of a single pulse as a float. Since duration 
-        is 1.0, the second argument is exactly equivalent to 
+def insertMetronomeMark(
+    offset: float, parts: List[music21.part.Part], bpm: int
+) -> List[float]:
+    """
+    Insert a metronome marking in a list of parts at a given offset.
+
+    The constructor needs staff text as a string (empty for our purposes), pulses per
+    minute as an integer, and the duration in quarterLengths
+        of a single pulse as a float. Since duration
+        is 1.0, the second argument is exactly equivalent to
         BPM (beats per minute). """
     mark = music21.tempo.MetronomeMark("", bpm, 1.0)
     for part in parts:
@@ -138,9 +150,10 @@ def insertMetronomeMark(offset, parts, bpm):
     return [offset, offset]
 
 
-def removeMetronomeMark(offset, parts):
-    """ Remove a metronome marking from each part in
-        a list of parts at a given offset. """
+def removeMetronomeMark(
+    offset: float, parts: List[music21.part.Part]
+) -> List[float]:
+    """Remove a metronome marking from all parts at a given offset."""
     for part in parts:
         markings = part.metronomeMarkBoundaries()
         for marking in markings:
@@ -149,9 +162,8 @@ def removeMetronomeMark(offset, parts):
     return [offset, offset]
 
 
-def createNote(pitchName, durationInQLs):
-    """ Creates a Note from the name of a pitch (as a string)
-        and a duration in quarter lengths (as a float). """
+def createNote(pitchName: str, durationInQLs: float) -> music21.note.Note:
+    """Creates a Note from the name of a pitch and a duration in quarter lengths."""
     note = music21.note.Note(pitchName)
     note.duration = music21.duration.Duration(durationInQLs)
     note.pitch.spellingIsInferred = False
@@ -161,7 +173,7 @@ def createNote(pitchName, durationInQLs):
 
 
 def insertNote(offset, part, pitchStr, duration):
-    """ Add a note at a given offset to a part. """
+    """Add a note at a given offset to a part."""
     newNote = createNote(pitchStr, duration)
     bounds = (offset, offset + duration)
     notes = part.notes
@@ -183,7 +195,7 @@ def insertNote(offset, part, pitchStr, duration):
 
 
 def removeNote(offset, part, removedNoteName):
-    """ Remove a note at a given offset into a part. """
+    """Remove a note at a given offset into a part."""
     notes = part.notes
     maxLims = [offset, offset]
     for note in notes:
@@ -201,11 +213,13 @@ def removeNote(offset, part, removedNoteName):
 
 
 def updateTieStatus(offset, part, noteName):
-    """ Updates the tie status of a note with the name noteName
-        at a given offset into a given part. The offset given to
-        this function MUST be the same as the offset of the
-        FIRST note in a legally tie-able pair of notes (the notes
-        must be the same pitch, and there must be no rests between them)."""
+    """
+    Updates the tie status of a note with the name noteName at a given offset.
+
+    The offset given to this function MUST be the same as the offset of the
+    FIRST note in a legally tie-able pair of notes (the notes
+    must be the same pitch, and there must be no rests between them).
+    """
     notes = part.notes
     for note in notes:
         pitchStr = note.pitch.nameWithOctave
@@ -222,9 +236,13 @@ def updateTieStatus(offset, part, noteName):
 
 
 def makeTieUpdate(notes):
-    """ If the pair of notes passed to this function is untied,
-        this function ties them together. If ther pair of notes
-        passed to this function is tied, the tie is severed. """
+    """
+    Make an update to how a set of notes are tied together.
+
+    If the pair of notes passed to this function is untied,
+    this function ties them together. If ther pair of notes
+    passed to this function is tied, the tie is severed.
+    """
     [firstNote, secondNote] = notes
     # Add Ties
     if firstNote.tie is None and secondNote.tie is None:
@@ -274,19 +292,21 @@ def makeTieUpdate(notes):
 
 
 def transpose(part, semitones):
-    """ Transposes the whole part up or down
-        by an integer number of semitones. """
+    """Transposes the whole part up or down by an integer number of semitones."""
     part = part.transpose(semitones)
     return [0.0, part.highestTime]
 
 
 def insertClef(offset, part, clefStr):
-    """ Inserts a new clef at a given offset in a given part.
-        The types of clefs supported ON THE BACKEND are:
-        'treble', 'treble8va', 'treble8vb, 'bass', 'bass8va',
-        'bass8vb', 'frenchviolin', 'alto', 'tenor', 'cbaritone',
-        'fbaritone', 'gsoprano', 'mezzosoprano', 'soprano',
-        'percussion', and 'tab'. """
+    """
+    Inserts a new clef at a given offset in a given part.
+
+    The types of clefs supported ON THE BACKEND are:
+    'treble', 'treble8va', 'treble8vb, 'bass', 'bass8va',
+    'bass8vb', 'frenchviolin', 'alto', 'tenor', 'cbaritone',
+    'fbaritone', 'gsoprano', 'mezzosoprano', 'soprano',
+    'percussion', and 'tab'.
+    """
     newClef = music21.clef.clefFromString(clefStr)
     elems = part.getElementsByOffset(offset)
     # Only clef objects have an octaveChange field
@@ -299,7 +319,7 @@ def insertClef(offset, part, clefStr):
 
 
 def removeClef(offset, part):
-    """ Remove a clef from a given offset in a given part. """
+    """Remove a clef from a given offset in a given part."""
     elems = part.getElementsByOffset(offset)
     for elem in elems:
         # Only clef objects have an octaveChange field
@@ -311,15 +331,20 @@ def removeClef(offset, part):
 
 
 def insertMeasures(insertionOffset, part, insertedQLs):
-    """ Insert measures in a part by moving the offsets of
-        portions of the score by a given number of QLs. """
+    """
+    Insert measures in a part.
+
+    Do this by moving the offsets of portions of the score by a given number of QLs.
+    """
     return [insertionOffset, part.highestTime]
 
 
 def addInstrument(offset, part, instrumentStr):
-    """ Given an instrument name, assigns that instrument
-        to a part in the score. The number of instruments
-        supported on the backend are much to numerous to name."""
+    """
+    Given an instrument name, assigns that instrument to a part in the score.
+
+    The number of instruments supported on the backend are much to numerous to name.
+    """
     instrument = music21.instrument.fromString(instrumentStr)
     elems = part.getElementsByOffset(offset)
     for elem in elems:
@@ -331,7 +356,7 @@ def addInstrument(offset, part, instrumentStr):
 
 
 def removeInstrument(offset, part):
-    """ Remove an instrument beginning at offset from a given part. """
+    """Remove an instrument beginning at offset from a given part."""
     elems = part.getElementsByOffset(offset)
     for elem in elems:
         if hasattr(elem, "instrumentName"):
@@ -342,9 +367,12 @@ def removeInstrument(offset, part):
 
 
 def addDynamic(offset, part, dynamicStr):
-    """ Adds a dynamic marking to a part at a given offset.
-        Acceptable values of dynamicStr are 'ppp', 'pp', 'p',
-        'mp', 'mf', 'f', 'ff', and 'fff'. """
+    """
+    Adds a dynamic marking to a part at a given offset.
+
+    Acceptable values of dynamicStr are 'ppp', 'pp', 'p',
+    'mp', 'mf', 'f', 'ff', and 'fff'.
+    """
     dynamic = music21.dynamics.Dynamic(dynamicStr)
     elems = part.getElementsByOffset(offset)
     for elem in elems:
@@ -356,7 +384,7 @@ def addDynamic(offset, part, dynamicStr):
 
 
 def removeDynamic(offset, part):
-    """ Removes a dynamic marking from a part at a given offset. """
+    """Removes a dynamic marking from a part at a given offset."""
     elems = part.getElementsByOffset(offset)
     for elem in elems:
         if hasattr(elem, "volumeScalar"):
@@ -366,7 +394,7 @@ def removeDynamic(offset, part):
 
 
 def addLyric(offset, part, lyric):
-    """ Add lyrics to a given note in the score. """
+    """Add lyrics to a given note in the score."""
     notes = part.notes
     for note in notes:
         if note.offset == offset:
@@ -376,16 +404,18 @@ def addLyric(offset, part, lyric):
 
 
 def playback(part):
-    """ Playback the current project from the beginning 
-        of a part. """
+    """Playback the current project from the beginning of a part."""
     music21.midi.realtime.StreamPlayer(part).play()
 
 
 def boundedOffset(part, bounds):
-    """ Returns a bounded offset list for GUI uses. 
-        An offset map is an (element, offset, endTime) triple.
-        element is the music21 object to insert.
-        offset is the insertion offset of the music21 object. 
-        endTime is the termination offset of the music21 object. """
+    """
+    Returns a bounded offset list for GUI uses.
+
+    An offset map is an (element, offset, endTime) triple.
+    - element is the music21 object to insert.
+    - offset is the insertion offset of the music21 object.
+    - endTime is the termination offset of the music21 object. """
     offs = part.offsetMap()
     return [x for x in offs if bounds[0] <= x.offset and x.endTime < bounds[1]]
+
