@@ -1,6 +1,4 @@
-FROM composte:latest
-
-COPY . .
+FROM alexisegoodfellow/composte:latest
 
 RUN pip install -r requirements-test.txt -r requirements.txt
 
