@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: composte:latest
-    working_directory: /go/src/github.com/AlexisGoodfellow/composte
+    working_directory: /app
 
     environment:
       TEST_RESULTS: /tmp/test-results

@@ -1,4 +1,4 @@
-FROM composte:latest
+FROM alexisegoodfellow/composte:latest
 
 RUN pip install -r requirements.lock
 
