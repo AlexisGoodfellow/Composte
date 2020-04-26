@@ -5,25 +5,23 @@
 # * Separation of broadcasts per project (regardless of encryption)
 #       Would require moving from single broadcast to some other strategy
 
-from composte.network.server import Server as NetworkServer
-from composte.network.fake.security import Encryption
-from composte.network.base.loggable import DevNull, StdErr, Combined
-from composte.network.base.exceptions import GenericError
-from composte.conf import logging as networkLog
-
-from composte.protocol import client, server
-from composte.auth import auth
-from composte.db import driver
-
-from composte.util import musicWrapper, bookkeeping, composteProject, timer, misc
-
-from threading import Thread, Lock
-import uuid
 import json
+import logging
 import os
 import sqlite3
-import logging
 import traceback
+import uuid
+from threading import Lock, Thread
+
+from composte.auth import auth
+from composte.conf import logging as networkLog
+from composte.db import driver
+from composte.network.base.exceptions import GenericError
+from composte.network.base.loggable import Combined, DevNull, StdErr
+from composte.network.fake.security import Encryption
+from composte.network.server import Server as NetworkServer
+from composte.protocol import client, server
+from composte.util import bookkeeping, composteProject, misc, musicWrapper, timer
 
 
 class ComposteServer:

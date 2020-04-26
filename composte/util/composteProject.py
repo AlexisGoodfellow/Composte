@@ -1,7 +1,9 @@
-import music21
-import uuid
-import json
 import base64
+import json
+import uuid
+
+import music21
+
 from network.base.exceptions import GenericError
 
 # from copy import deepcopy

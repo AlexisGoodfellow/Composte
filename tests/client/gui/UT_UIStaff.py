@@ -3,16 +3,15 @@
 import sys
 
 import music21
-
-from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene
 import PyQt5.QtCore as QtCore
+from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
 
-from client.gui.UIMeasure import UIMeasure
-from client.gui.UIStaff import UIStaff
 import client.gui.UIClef as UIClef
-import client.gui.UITimeSignature as UITimeSignature
 import client.gui.UIKeySignature as UIKeySignature
 import client.gui.UINote as UINote
+import client.gui.UITimeSignature as UITimeSignature
+from client.gui.UIMeasure import UIMeasure
+from client.gui.UIStaff import UIStaff
 
 WIDTH = 200
 

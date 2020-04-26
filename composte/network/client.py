@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+from queue import Queue
+from threading import Lock, Thread
+
 import zmq
 
+from network.base.exceptions import DecryptError, EncryptError, GenericError
+from network.base.loggable import DevNull, Loggable
 from network.fake.security import Encryption, Log
-from network.base.exceptions import EncryptError, DecryptError, GenericError
-from network.base.loggable import Loggable, DevNull
-
-from threading import Thread, Lock
-from queue import Queue
 
 
 class Subscription(Loggable):

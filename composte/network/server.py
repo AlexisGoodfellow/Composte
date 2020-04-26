@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 
+import logging
+# Need signal handlers to properly run as daemon
+import signal
+import sys
+import traceback
+from threading import Lock, Thread
+
 import zmq
+
+from network.base.exceptions import DecryptError, EncryptError, GenericError
+from network.base.loggable import Loggable, StdErr
+from network.conf import logging as log
+from network.fake.security import Encryption, Log
 
 # A REP socket replies to the client who sent the last message. This means
 # that we can't really get away with worker threads here, as
@@ -8,18 +20,8 @@ import zmq
 # to be generally tractable though, per
 # https://stackoverflow.com/questions/29420666/zmq-multiple-request-reply-pairs
 
-from network.fake.security import Encryption, Log
-from network.base.exceptions import DecryptError, EncryptError, GenericError
-from network.base.loggable import Loggable, StdErr
-from network.conf import logging as log
 
-import logging
-from threading import Lock, Thread
 
-# Need signal handlers to properly run as daemon
-import signal
-import sys
-import traceback
 
 DEBUG = False
 

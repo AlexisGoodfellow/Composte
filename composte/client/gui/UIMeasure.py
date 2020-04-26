@@ -1,10 +1,10 @@
-from PyQt5 import QtWidgets, QtGui
+import music21
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsLineItem
+
 from client.gui import UISettings
 from client.gui.UINote import UINote
-
-import music21
 
 
 class UIMeasure(QtWidgets.QGraphicsItemGroup):

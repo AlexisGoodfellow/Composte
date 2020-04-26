@@ -1,6 +1,7 @@
-from PyQt5 import QtWidgets, QtCore
-from client.gui.UIStaff import UIStaff
+from PyQt5 import QtCore, QtWidgets
+
 import client.gui.UISettings as UISet
+from client.gui.UIStaff import UIStaff
 
 
 class UIStaffGroup(QtWidgets.QGraphicsItemGroup):

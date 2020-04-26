@@ -1,6 +1,7 @@
-from PyQt5 import QtWidgets, QtCore
-from client.gui.UIMeasure import UIMeasure
+from PyQt5 import QtCore, QtWidgets
+
 import client.gui.UISettings as UISet
+from client.gui.UIMeasure import UIMeasure
 
 
 class UIStaff(QtWidgets.QGraphicsItemGroup):

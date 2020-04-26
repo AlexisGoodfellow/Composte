@@ -1,12 +1,9 @@
 import music21
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 import ComposteClient
-
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-
-from client.gui import UINote, UIClef, UITimeSignature, UIKeySignature
+from client.gui import UIClef, UIKeySignature, UINote, UITimeSignature
 from client.gui.UIScoreViewport import UIScoreViewport
 
 

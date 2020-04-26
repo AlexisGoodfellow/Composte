@@ -1,17 +1,15 @@
 import music21
-
-import util.musicFuns as musicFuns
-
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-import client.gui.UISettings as UISet
-from client.gui.UIMeasure import UIMeasure
-from client.gui.UIStaffGroup import UIStaffGroup
-import client.gui.UINote as UINote
 import client.gui.UIClef as UIClef
 import client.gui.UIKeySignature as UIKeySignature
+import client.gui.UINote as UINote
+import client.gui.UISettings as UISet
 import client.gui.UITimeSignature as UITimeSignature
+import util.musicFuns as musicFuns
+from client.gui.UIMeasure import UIMeasure
+from client.gui.UIStaffGroup import UIStaffGroup
 
 
 class UIScoreViewport(QtWidgets.QGraphicsView):
