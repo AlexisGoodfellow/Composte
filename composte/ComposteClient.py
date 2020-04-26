@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 
-from network.client import Client as NetworkClient
-from network.fake.security import Encryption
-from network.base.loggable import DevNull, StdErr
-from network.base.exceptions import GenericError
-
-from client import editor
-
-from protocol import client, server
-from util import misc
-from threading import Thread, Lock
-from util.repl import the_worst_repl_you_will_ever_see
-import util.musicFuns
-import util.musicWrapper
-import util.composteProject
 import json
-import music21
+import shlex
+import subprocess
 import traceback
 import uuid
-import subprocess
-import shlex
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
+from threading import Lock, Thread
+
+import music21
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import Q_ARG, Q_RETURN_ARG
+from PyQt5.QtCore import Qt
+
+import util.composteProject
+import util.musicFuns
+import util.musicWrapper
+from client import editor
+from network.base.exceptions import GenericError
+from network.base.loggable import DevNull, StdErr
+from network.client import Client as NetworkClient
+from network.fake.security import Encryption
+from protocol import client, server
+from util import misc
+from util.repl import the_worst_repl_you_will_ever_see
 
 DEBUG = False
 

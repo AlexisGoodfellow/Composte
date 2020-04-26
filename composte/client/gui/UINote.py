@@ -7,12 +7,11 @@ not been a priority.
 
 
 import music21
-
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-from util.classExceptions import virtualmethod
 import client.gui.UISettings as UISet
+from util.classExceptions import virtualmethod
 
 
 def ntypeFromMusic21(note: music21.note.Note):

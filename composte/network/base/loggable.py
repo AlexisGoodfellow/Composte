@@ -1,6 +1,7 @@
-from . import exceptions
-
 import logging
+import sys
+
+from . import exceptions
 
 
 class IsNone(exceptions.GenericError):
@@ -113,7 +114,6 @@ class AdHoc:
         self.__log(self.__prefixes["critical"] + str(message), logging.CRITICAL)
 
 
-import sys
 
 StdErr = AdHoc(sys.stderr, name="stderr")
 

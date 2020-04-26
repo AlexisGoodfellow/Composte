@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+
 import music21
 
 from protocol.base.exceptions import DeserializationFailure

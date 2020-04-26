@@ -3,17 +3,15 @@
 import sys
 
 import music21
-
-from util.composteProject import ComposteProject
-
-from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene
 import PyQt5.QtCore as QtCore
+from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
 
-import client.gui.UIScoreViewport as UIScoreViewport
-from client.gui.UIMeasure import UIMeasure
 import client.gui.UIClef as UIClef
-import client.gui.UITimeSignature as UITimeSignature
 import client.gui.UINote as UINote
+import client.gui.UIScoreViewport as UIScoreViewport
+import client.gui.UITimeSignature as UITimeSignature
+from client.gui.UIMeasure import UIMeasure
+from util.composteProject import ComposteProject
 
 WIDTH = 1000
 

@@ -1,7 +1,7 @@
-import os, sys
-
 import logging
 import logging.config
+import os
+import sys
 
 
 def setup():

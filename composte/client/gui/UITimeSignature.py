@@ -1,5 +1,4 @@
 import music21
-
 from PyQt5 import QtWidgets
 
 

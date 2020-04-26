@@ -5,11 +5,12 @@
 # the desired function must have been determined
 # before these functions are called.
 
-from util import musicFuns
-from util import composteProject
-from network.base.exceptions import GenericError
-import music21
 import json
+
+import music21
+
+from network.base.exceptions import GenericError
+from util import composteProject, musicFuns
 
 
 def performMusicFun(

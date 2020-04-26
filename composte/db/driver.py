@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sqlite3
 import json
+import sqlite3
 from threading import Lock
 
 # We are inspired by Django, but we're not that good at

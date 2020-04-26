@@ -1,5 +1,6 @@
-import musicFuns
 import music21
+
+import musicFuns
 
 s = music21.stream.Stream()
 musicFuns.insertNote(0.0, s, "C#4", 1.0)

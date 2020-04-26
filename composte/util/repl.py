@@ -6,11 +6,12 @@
 # advance for the pain that attempting to understand the contents of this file
 # will cause you.
 
-import re
-import os, sys
 import inspect
-import time
 import json
+import os
+import re
+import sys
+import time
 
 DEBUG = True
 
