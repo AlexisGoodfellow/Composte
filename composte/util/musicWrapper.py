@@ -10,16 +10,18 @@ import json
 import music21
 
 from network.base.exceptions import GenericError
-from util import composteProject, musicFuns
+from util import musicFuns
 
 
 def performMusicFun(
     projectID, fname, args, partIndex=None, offset=None, fetchProject=None
 ):
-    """ Wrapper for all music functions, where the
-        name of the function to be called (as a string)
-        is the first argument, and the arguments to the
-        function (as a list) is the second. """
+    """
+    Wrapper for all music functions.
+
+    The name of the function to be called (as a string) is the first argument,
+    and the arguments to the function (as a list) is the second.
+    """
     # Fetch the project before anything else
     # for ease of use
     project = fetchProject(projectID)
@@ -28,8 +30,11 @@ def performMusicFun(
         return ("ok", "")  # Why not make a chat server too?
 
     def unpackFun(fname, args):
-        """ Determines which function to call and
-            casts all arguments to the correct types. """
+        """
+        Determine which function to call.
+
+        Casts all arguments to the correct types.
+        """
         try:
             if partIndex is not None and partIndex != "None":
                 musicObject = project.parts[int(partIndex)]
@@ -103,3 +108,4 @@ def performMusicFun(
 
     # End error handling
     return ("ok", updateOffsets)
+
