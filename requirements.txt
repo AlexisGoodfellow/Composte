@@ -6,3 +6,7 @@ PyQt5
 python-dateutil
 pyzmq
 smmap2
+matplotlib
+scipy
+numpy
+pygame==2.0.0.dev6

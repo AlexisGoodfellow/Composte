@@ -15,6 +15,15 @@ x-defaults: &defaults
     - ./:/app
 
 services:
+  server:
+    <<: *defaults
+    build:
+      dockerfile: ./docker/prod.dockerfile
+      context: .
+    command: python composte/ComposteServer.py
+    volumes:
+      - ./:/app
+
   # run tests & lints
   test:
     <<: *defaults
@@ -25,6 +34,7 @@ services:
     volumes:
       - ./:/app
 
+  # Create an updated requirements.lock
   lock-requirements:
     <<: *defaults
     entrypoint: /bin/bash

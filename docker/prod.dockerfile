@@ -25,5 +25,4 @@ RUN pip install -r requirements.lock
 
 EXPOSE 5000 5001
 
-CMD ["/bin/bash"]
-# CMD [ "python", "./ComposteServer.py" ]
+CMD [ "python", "composte/ComposteServer.py" ]
