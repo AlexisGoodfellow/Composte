@@ -10,7 +10,7 @@ from threading import Lock, Thread
 import zmq
 
 from network.base.exceptions import DecryptError, EncryptError, GenericError
-from network.base.loggable import Loggable, StdErr
+from network.base.loggable import Loggable
 from network.conf import logging as log
 from network.fake.security import Encryption, Log
 
@@ -21,9 +21,8 @@ from network.fake.security import Encryption, Log
 # https://stackoverflow.com/questions/29420666/zmq-multiple-request-reply-pairs
 
 
-
-
 DEBUG = False
+
 
 # Broadcast socket   -> Publish/Subscribe
 # Interactive socket -> Request/Reply

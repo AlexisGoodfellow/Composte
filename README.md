@@ -19,7 +19,7 @@ For even worse documentation, see [docs](doc/index.md).
 
 In general, you can fetch the latest stable version from here:
 
-    git clone https://github.com/tmager/Composte.git
+    git clone https://github.com/AlexisGoodfellow/Composte.git
 
 Occasionally, you may find that the server you are connecting to uses a
 different version, and you will have to obtain a client of that version. One
