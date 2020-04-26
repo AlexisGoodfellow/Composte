@@ -114,7 +114,6 @@ class AdHoc:
         self.__log(self.__prefixes["critical"] + str(message), logging.CRITICAL)
 
 
-
 StdErr = AdHoc(sys.stderr, name="stderr")
 
 # Combine loggers
