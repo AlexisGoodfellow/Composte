@@ -9,6 +9,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from client.gui import UINote, UIClef, UITimeSignature, UIKeySignature
 from client.gui.UIScoreViewport import UIScoreViewport
 
+
 class Editor(QtWidgets.QMainWindow):
 
     """
@@ -17,26 +18,25 @@ class Editor(QtWidgets.QMainWindow):
 
     ## For looking up note types from commands in the debug console.
     __noteTypeLookup = {
-        'whole'   : UINote.UINote_Whole,
-        'half'    : UINote.UINote_Half,
-        'quarter' : UINote.UINote_Quarter,
-        'eighth' : UINote.UINote_Eighth,
-        '8th' : UINote.UINote_Eighth,
-        'sixteenth' : UINote.UINote_16th,
-        '16th' : UINote.UINote_16th,
-        'half.'    : UINote.UINote_Half_Dotted,
-        'quarter.' : UINote.UINote_Quarter_Dotted,
-        'eighth.' : UINote.UINote_Eighth_Dotted,
-        '8th.' : UINote.UINote_Eighth_Dotted,
-        'sixteenth.' : UINote.UINote_16th_Dotted,
-        '16th.' : UINote.UINote_16th_Dotted,
+        "whole": UINote.UINote_Whole,
+        "half": UINote.UINote_Half,
+        "quarter": UINote.UINote_Quarter,
+        "eighth": UINote.UINote_Eighth,
+        "8th": UINote.UINote_Eighth,
+        "sixteenth": UINote.UINote_16th,
+        "16th": UINote.UINote_16th,
+        "half.": UINote.UINote_Half_Dotted,
+        "quarter.": UINote.UINote_Quarter_Dotted,
+        "eighth.": UINote.UINote_Eighth_Dotted,
+        "8th.": UINote.UINote_Eighth_Dotted,
+        "sixteenth.": UINote.UINote_16th_Dotted,
+        "16th.": UINote.UINote_16th_Dotted,
     }
     __defaultClef = UIClef.treble()
-    __defaultTimeSignature = UITimeSignature.UITimeSignature(4,4)
+    __defaultTimeSignature = UITimeSignature.UITimeSignature(4, 4)
     __defaultKeySignature = UIKeySignature.C()
 
-    def __init__(self, client: ComposteClient.ComposteClient,
-                 *args, **kwargs):
+    def __init__(self, client: ComposteClient.ComposteClient, *args, **kwargs):
         """
         Start a new editor, working on the projected loaded by client.
 
@@ -64,8 +64,7 @@ class Editor(QtWidgets.QMainWindow):
         """
         ## FIXME: Updating of specific sections not working quite yet.
         try:
-            self.__ui_scoreViewport.update(self.__client.project(),
-                                           None, None)
+            self.__ui_scoreViewport.update(self.__client.project(), None, None)
         except ValueError as e:
             self.__debugConsoleWrite(str(e))
 
@@ -82,29 +81,28 @@ class Editor(QtWidgets.QMainWindow):
         """
         self.__ui_mainSplitter = QtWidgets.QSplitter(Qt.Vertical, self)
 
-        self.__ui_scoreViewport = \
-                            UIScoreViewport(parent = self.__ui_mainSplitter)
+        self.__ui_scoreViewport = UIScoreViewport(parent=self.__ui_mainSplitter)
 
         # For some reason this string can't be blank, but it can be anything
         # else that isn't a font.
-        self.__ui_debugConsole_font = QtGui.QFont('nothing')
+        self.__ui_debugConsole_font = QtGui.QFont("nothing")
         self.__ui_debugConsole_font.setStyleHint(QtGui.QFont.Monospace)
 
-        self.__ui_debugConsole_layoutWidget = \
-                            QtWidgets.QWidget(self.__ui_mainSplitter)
-        self.__ui_debugConsole_layout = \
-                    QtWidgets.QVBoxLayout(self.__ui_debugConsole_layoutWidget)
-        self.__ui_debugConsole_layoutWidget \
-                            .setLayout(self.__ui_debugConsole_layout)
-        self.__ui_debugConsole_log = \
-                        QtWidgets.QTextEdit(self.__ui_debugConsole_layoutWidget)
+        self.__ui_debugConsole_layoutWidget = QtWidgets.QWidget(self.__ui_mainSplitter)
+        self.__ui_debugConsole_layout = QtWidgets.QVBoxLayout(
+            self.__ui_debugConsole_layoutWidget
+        )
+        self.__ui_debugConsole_layoutWidget.setLayout(self.__ui_debugConsole_layout)
+        self.__ui_debugConsole_log = QtWidgets.QTextEdit(
+            self.__ui_debugConsole_layoutWidget
+        )
         self.__ui_debugConsole_log.setReadOnly(True)
         self.__ui_debugConsole_log.setFont(self.__ui_debugConsole_font)
-        self.__ui_debugConsole_input = \
-                        QtWidgets.QLineEdit(self.__ui_debugConsole_layoutWidget)
+        self.__ui_debugConsole_input = QtWidgets.QLineEdit(
+            self.__ui_debugConsole_layoutWidget
+        )
         self.__ui_debugConsole_input.setFont(self.__ui_debugConsole_font)
-        self.__ui_debugConsole_input.returnPressed \
-                            .connect(self.__processDebugInput)
+        self.__ui_debugConsole_input.returnPressed.connect(self.__processDebugInput)
         self.__ui_debugConsole_layout.addWidget(self.__ui_debugConsole_log)
         self.__ui_debugConsole_layout.addWidget(self.__ui_debugConsole_input)
         self.__ui_debugConsole_layoutWidget.hide()
@@ -124,25 +122,25 @@ class Editor(QtWidgets.QMainWindow):
         """
         Construct the menu bar.
         """
-        self.__ui_filemenu = QtWidgets.QMenu('File', parent = self)
-        self.__ui_editmenu = QtWidgets.QMenu('Edit', parent = self)
+        self.__ui_filemenu = QtWidgets.QMenu("File", parent=self)
+        self.__ui_editmenu = QtWidgets.QMenu("Edit", parent=self)
 
-        self.__ui_act_debugConsole = \
-                        self.__ui_filemenu.addAction('Debug Console Enabled')
+        self.__ui_act_debugConsole = self.__ui_filemenu.addAction(
+            "Debug Console Enabled"
+        )
         self.__ui_act_debugConsole.setCheckable(True)
-        self.__ui_act_debugConsole \
-                        .setShortcut(QtGui.QKeySequence(Qt.Key_Escape))
+        self.__ui_act_debugConsole.setShortcut(QtGui.QKeySequence(Qt.Key_Escape))
         self.__ui_act_debugConsole.changed.connect(self.__toggleDebug)
 
-        self.__ui_act_quit = self.__ui_filemenu.addAction('Quit')
-        self.__ui_act_quit.setShortcut(QtGui.QKeySequence('Ctrl+Q'))
+        self.__ui_act_quit = self.__ui_filemenu.addAction("Quit")
+        self.__ui_act_quit.setShortcut(QtGui.QKeySequence("Ctrl+Q"))
         self.__ui_act_quit.triggered.connect(self.closeEvent)
 
-        self.__ui_act_edit = self.__ui_editmenu.addAction('Play')
-        self.__ui_act_edit.setShortcut(QtGui.QKeySequence('Ctrl+space'))
+        self.__ui_act_edit = self.__ui_editmenu.addAction("Play")
+        self.__ui_act_edit.setShortcut(QtGui.QKeySequence("Ctrl+space"))
         self.__ui_act_edit.triggered.connect(self.__handlePlay)
 
-        self.__ui_menubar = QtWidgets.QMenuBar(parent = self)
+        self.__ui_menubar = QtWidgets.QMenuBar(parent=self)
         self.__ui_menubar.addMenu(self.__ui_filemenu)
         self.__ui_menubar.addMenu(self.__ui_editmenu)
 
@@ -183,12 +181,13 @@ class Editor(QtWidgets.QMainWindow):
         """
         Show/hide the debug console.
         """
-        self.__ui_debugConsole_layoutWidget \
-                            .setVisible(self.__ui_act_debugConsole.isChecked())
+        self.__ui_debugConsole_layoutWidget.setVisible(
+            self.__ui_act_debugConsole.isChecked()
+        )
         if self.__ui_act_debugConsole.isChecked():
             self.__ui_debugConsole_input.setFocus()
 
-    def __debugConsoleHelp(self, fn = None):
+    def __debugConsoleHelp(self, fn=None):
         """
         Print a help message to the debug console.
 
@@ -196,41 +195,52 @@ class Editor(QtWidgets.QMainWindow):
             print just the help for that command.
         """
         if fn is None:
-            msg = ('help/?       --  Display this help message\n'
-                   'CMD1 ; CMD2  --  Execute CMD1 followed by CMD2')
+            msg = (
+                "help/?       --  Display this help message\n"
+                "CMD1 ; CMD2  --  Execute CMD1 followed by CMD2"
+            )
             self.__debugConsoleWrite(msg)
-        if fn == 'clear' or fn is None:
-            msg = 'clear        --  Clear the debug console history'
+        if fn == "clear" or fn is None:
+            msg = "clear        --  Clear the debug console history"
             self.__debugConsoleWrite(msg)
-        if fn == 'ttson' or fn is None:
-            msg = ('ttson        --  Enable text-to-speech for chat messages, '
-                   'if available.')
+        if fn == "ttson" or fn is None:
+            msg = (
+                "ttson        --  Enable text-to-speech for chat messages, "
+                "if available."
+            )
             self.__debugConsoleWrite(msg)
-        if fn == 'ttsoff' or fn is None:
-            msg = 'ttsoff       --  Disable text-to-speech for chat messages.'
+        if fn == "ttsoff" or fn is None:
+            msg = "ttsoff       --  Disable text-to-speech for chat messages."
             self.__debugConsoleWrite(msg)
-        if fn == 'play' or fn is None:
-            msg = ('play/p [PART_INDEX]\n'
-                   '    Play back the part specified by the given index, '
-                   'or part 0 if none is specified.')
+        if fn == "play" or fn is None:
+            msg = (
+                "play/p [PART_INDEX]\n"
+                "    Play back the part specified by the given index, "
+                "or part 0 if none is specified."
+            )
             self.__debugConsoleWrite(msg)
-        if fn == 'chat' or fn is None:
-            msg = ('chat/c MESSAGE\n'
-                   '    Send MESSAGE (which may contain spaces, but not '
-                   '    semicolons) to all users\n working on the current '
-                   '    project')
+        if fn == "chat" or fn is None:
+            msg = (
+                "chat/c MESSAGE\n"
+                "    Send MESSAGE (which may contain spaces, but not "
+                "    semicolons) to all users\n working on the current "
+                "    project"
+            )
             self.__debugConsoleWrite(msg)
-        if fn == 'insert' or fn is None:
-            msg = ('insert/i PART_INDEX PITCH NOTE_TYPE OFFSET\n'
-                   '    Insert a NOTE_TYPE into the indicated part, at \n'
-                   '    quarter-note-offset OFFSET and with the given PITCH')
+        if fn == "insert" or fn is None:
+            msg = (
+                "insert/i PART_INDEX PITCH NOTE_TYPE OFFSET\n"
+                "    Insert a NOTE_TYPE into the indicated part, at \n"
+                "    quarter-note-offset OFFSET and with the given PITCH"
+            )
             self.__debugConsoleWrite(msg)
-        if fn == 'delete' or fn is None:
-            msg = ('delete/d PART_INDEX PITCH OFFSET\n'
-                   '    Remove the note in the indicated part at\n'
-                   '    quarter-note-offset OFFSET and pitch PITCH')
+        if fn == "delete" or fn is None:
+            msg = (
+                "delete/d PART_INDEX PITCH OFFSET\n"
+                "    Remove the note in the indicated part at\n"
+                "    quarter-note-offset OFFSET and pitch PITCH"
+            )
             self.__debugConsoleWrite(msg)
-
 
     def __handleAddPart(self, clef):
         """
@@ -238,7 +248,7 @@ class Editor(QtWidgets.QMainWindow):
         """
         raise NotImplementedError
 
-    def __handlePlay(self, part = 0):
+    def __handlePlay(self, part=0):
         """
         Tell the Composte client to play back the given part.
         """
@@ -252,8 +262,9 @@ class Editor(QtWidgets.QMainWindow):
         """
         self.__ui_scoreViewport.addLine()
 
-    def __handleInsertNote(self, partIdx: int,
-                           pitch: music21.pitch.Pitch, ntype, offset: float):
+    def __handleInsertNote(
+        self, partIdx: int, pitch: music21.pitch.Pitch, ntype, offset: float
+    ):
         """
         Tell the Composte client to insert a note into the current project.
 
@@ -264,11 +275,17 @@ class Editor(QtWidgets.QMainWindow):
         :param offset: Offset (in quarterlengths) from the beginning of the
             piece at which the note should be inserted.
         """
-        self.__client.insertNote(self.__client.project().projectID,
-                                 offset, partIdx, str(pitch), ntype.length())
+        self.__client.insertNote(
+            self.__client.project().projectID,
+            offset,
+            partIdx,
+            str(pitch),
+            ntype.length(),
+        )
 
-    def __handleDeleteNote(self, partIdx: int,
-                           pitch: music21.pitch.Pitch, offset: float):
+    def __handleDeleteNote(
+        self, partIdx: int, pitch: music21.pitch.Pitch, offset: float
+    ):
         """
         Tell the Composte client to remove a note from the current project.
 
@@ -277,8 +294,9 @@ class Editor(QtWidgets.QMainWindow):
         :param offset: Offset (in quarterlengths) from the beginning of the
             piece of the note to be removed.
         """
-        self.__client.removeNote(self.__client.project().projectID,
-                                 offset, partIdx, str(pitch))
+        self.__client.removeNote(
+            self.__client.project().projectID, offset, partIdx, str(pitch)
+        )
 
     def __handleChatMessage(self, name, msg):
         """
@@ -287,8 +305,7 @@ class Editor(QtWidgets.QMainWindow):
         :param name: The username to be displayed with the message.
         :param msg: The message to be broadcast.
         """
-        self.__client.chat(self.__client.project().projectID,
-                           name, msg)
+        self.__client.chat(self.__client.project().projectID, name, msg)
 
     def __handleTTSon(self):
         """
@@ -310,7 +327,7 @@ class Editor(QtWidgets.QMainWindow):
         self.__ui_debugConsole_input.clear()
         if not text:
             return
-        cmdstrs = map(str.strip, text.split(';'))
+        cmdstrs = map(str.strip, text.split(";"))
         for cmdstr in cmdstrs:
             self.__processDebugCommand(cmdstr)
 
@@ -320,96 +337,95 @@ class Editor(QtWidgets.QMainWindow):
 
         :param cmdstr: The command to be executed, as an unparsed string.
         """
-        args = cmdstr.split(' ')
+        args = cmdstr.split(" ")
         cmd = args[0].lower()
         args.pop(0)
 
-        if cmd in ['clear']:
+        if cmd in ["clear"]:
             self.__ui_debugConsole_log.clear()
-        elif cmd in ['chat', 'c']:
+        elif cmd in ["chat", "c"]:
             if len(args) == 0:
-                self.__debugConsoleHelp('chat')
+                self.__debugConsoleHelp("chat")
             name = args[0]
-            self.__handleChatMessage(name, ' '.join(args[1:]))
-        elif cmd in ['ttson']:
+            self.__handleChatMessage(name, " ".join(args[1:]))
+        elif cmd in ["ttson"]:
             self.__handleTTSon()
-        elif cmd in ['ttsoff']:
+        elif cmd in ["ttsoff"]:
             self.__handleTTSoff()
-        elif cmd in ['play', 'p']:
+        elif cmd in ["play", "p"]:
             if len(args) == 0:
                 self.__handlePlay()
             if len(args) == 1:
                 try:
                     partIdx = int(args[0])
                 except ValueError:
-                    msg = ('Unable to generate part index from \''
-                           + args[1] + '\'')
+                    msg = "Unable to generate part index from '" + args[1] + "'"
                     self.__debugConsoleWrite(msg)
                     return
                 self.__handlePlay(partIdx)
             else:
-                self.__debugConsoleHelp('play')
+                self.__debugConsoleHelp("play")
         ## NOT CURRENTLY SUPPORTED
         # elif cmd in ['addpart']:
         #     self.__handleAddPart(self.__defaultClef)
-        elif cmd in ['addline']:
+        elif cmd in ["addline"]:
             self.__handleAddLine()
-        elif cmd in ['insert','i']:
+        elif cmd in ["insert", "i"]:
             if len(args) != 4:
-                self.__debugConsoleHelp('insert')
+                self.__debugConsoleHelp("insert")
                 return
 
             try:
                 partIdx = int(args[0])
             except ValueError:
-                msg = 'Unable to generate part index from \'' + args[1] + '\''
+                msg = "Unable to generate part index from '" + args[1] + "'"
                 self.__debugConsoleWrite(msg)
 
             try:
                 pitch = music21.pitch.Pitch(args[1])
             except music21.pitch.PitchException:
-                msg = 'Unable to generate pitch from \'' + args[1] + '\''
+                msg = "Unable to generate pitch from '" + args[1] + "'"
                 self.__debugConsoleWrite(msg)
                 return
 
             if args[2].lower() in Editor.__noteTypeLookup:
                 ntype = Editor.__noteTypeLookup[args[2].lower()]
             else:
-                msg = 'Unknown note type \'' + args[2] + '\''
+                msg = "Unknown note type '" + args[2] + "'"
                 self.__debugConsoleWrite(msg)
                 return
 
             try:
                 offset = float(args[3])
             except ValueError:
-                msg = 'Unable to generate time offset from \'' + args[3] + '\''
+                msg = "Unable to generate time offset from '" + args[3] + "'"
                 self.__debugConsoleWrite(msg)
                 return
 
             self.__handleInsertNote(partIdx, pitch, ntype, offset)
-        elif cmd in ['delete','d']:
+        elif cmd in ["delete", "d"]:
             if len(args) != 3:
-                self.__debugConsoleHelp('delete')
+                self.__debugConsoleHelp("delete")
                 return
 
             try:
                 partIdx = int(args[0])
             except ValueError:
-                msg = 'Unable to generate part index from \'' + args[1] + '\''
+                msg = "Unable to generate part index from '" + args[1] + "'"
                 self.__debugConsoleWrite(msg)
                 return
 
             try:
                 pitch = music21.pitch.Pitch(args[1])
             except music21.pitch.PitchException:
-                msg = 'Unable to generate pitch from \'' + args[1] + '\''
+                msg = "Unable to generate pitch from '" + args[1] + "'"
                 self.__debugConsoleWrite(msg)
                 return
 
             try:
                 offset = float(args[2])
             except ValueError:
-                msg = 'Unable to generate time offset from \'' + args[2] + '\''
+                msg = "Unable to generate time offset from '" + args[2] + "'"
                 self.__debugConsoleWrite(msg)
                 return
 

@@ -2,8 +2,8 @@ import music21
 
 from PyQt5 import QtWidgets
 
-class UITimeSignature(QtWidgets.QGraphicsItem):
 
+class UITimeSignature(QtWidgets.QGraphicsItem):
     def __init__(self, num, den, *args, **kwargs):
         """
         :param num: Numerator of the time signature.
@@ -19,7 +19,9 @@ class UITimeSignature(QtWidgets.QGraphicsItem):
     def measureLength(self):
         return 4 * self.__num / self.__den
 
+
 # END class UITimeSignature
+
 
 def fromMusic21(ts: music21.meter.TimeSignature):
     """

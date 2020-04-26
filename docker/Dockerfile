@@ -1,6 +1,4 @@
 # This is the base docker-image for composte
-# Ensure to always run "docker build -t composte:latest docker/".
-# We are not publishing to Docker Hub for the time being
 FROM centos:latest
 
 USER root

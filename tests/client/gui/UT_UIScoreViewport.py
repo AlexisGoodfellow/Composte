@@ -16,15 +16,18 @@ import client.gui.UINote as UINote
 
 WIDTH = 200
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    vp = UIScoreViewport.UIScoreViewport(measuresPerLine = 5, width=1000)
-    vp.addPart(UIClef.treble(), UIKeySignature.C(),
-            UITimeSignature.UITimeSignature(4,4))
-    vp.addPart(UIClef.treble(), UIKeySignature.C(),
-            UITimeSignature.UITimeSignature(4,4))
-    vp.addPart(UIClef.treble(), UIKeySignature.C(),
-            UITimeSignature.UITimeSignature(4,4))
+    vp = UIScoreViewport.UIScoreViewport(measuresPerLine=5, width=1000)
+    vp.addPart(
+        UIClef.treble(), UIKeySignature.C(), UITimeSignature.UITimeSignature(4, 4)
+    )
+    vp.addPart(
+        UIClef.treble(), UIKeySignature.C(), UITimeSignature.UITimeSignature(4, 4)
+    )
+    vp.addPart(
+        UIClef.treble(), UIKeySignature.C(), UITimeSignature.UITimeSignature(4, 4)
+    )
     vp.addLine()
     vp.show()
     exit(app.exec_())

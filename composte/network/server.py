@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import zmq
+
 # A REP socket replies to the client who sent the last message. This means
 # that we can't really get away with worker threads here, as
 # REQ/Processing/REP must be serialized as a cohesive unit. This problem seems
@@ -26,8 +27,14 @@ DEBUG = False
 # Interactive socket -> Request/Reply
 class Server(Loggable):
     __context = zmq.Context()
-    def __init__(self, interactive_address, broadcast_address,
-            logger, encryption_scheme = Encryption()):
+
+    def __init__(
+        self,
+        interactive_address,
+        broadcast_address,
+        logger,
+        encryption_scheme=Encryption(),
+    ):
         """
         Server.__init__(self, interactive_address, broadcast_address,
             logger, encryption_scheme = Encryption(), logger = None)
@@ -53,7 +60,7 @@ class Server(Loggable):
         self.__done = False
 
         self.__ilock = Lock()
-        self.__block = Lock();
+        self.__block = Lock()
 
         self.__listen_thread = None
 
@@ -75,26 +82,36 @@ class Server(Loggable):
         """
         # Probably need a better generic failure message format, but eh
         self.error("Failure ({}): {}".format(message, reason))
-        self.__isocket.send_string("Failure ({}): {}".format(reason,
-            message))
+        self.__isocket.send_string("Failure ({}): {}".format(reason, message))
 
-    def start_background(self, handler = lambda x: x,
-            preprocess = lambda x: x, postprocess = lambda msg: msg,
-            poll_timeout = 2000):
+    def start_background(
+        self,
+        handler=lambda x: x,
+        preprocess=lambda x: x,
+        postprocess=lambda msg: msg,
+        poll_timeout=2000,
+    ):
         """
         Server.start_background
         Starts Server.__listen_almost_forever in a background thread,
         forwarding arguments. For further details, see
         Server.__listen_almost_forever
         """
-        if self.__listen_thread != None: return
-        self.__listen_thread = Thread(target = self.__listen_almost_forever,
-                args = (handler, preprocess, postprocess, poll_timeout))
+        if self.__listen_thread != None:
+            return
+        self.__listen_thread = Thread(
+            target=self.__listen_almost_forever,
+            args=(handler, preprocess, postprocess, poll_timeout),
+        )
         self.__listen_thread.start()
 
-    def __listen_almost_forever(self, handler = lambda x: x,
-            preprocess = lambda x: x, postprocess = lambda msg: msg,
-            poll_timeout = 2000):
+    def __listen_almost_forever(
+        self,
+        handler=lambda x: x,
+        preprocess=lambda x: x,
+        postprocess=lambda msg: msg,
+        poll_timeout=2000,
+    ):
         """
         Server.__listen_almost_forever(self, handler = lambda msg: msg,
             preprocess = lambda msg: msg, poll_timeout = 2000)
@@ -107,13 +124,14 @@ class Server(Loggable):
         try:
             while True:
                 with self.__dlock:
-                    if self.__done: break
+                    if self.__done:
+                        break
 
                 with self.__ilock:
                     nmsg = self.__isocket.poll(poll_timeout)
                     if nmsg == 0:
                         continue
-                    message =  self.__isocket.recv_string()
+                    message = self.__isocket.recv_string()
                     # Unconditionally catch and ignore _all_ unexpected
                     # exceptions during the invocations of client-provided
                     # functions
@@ -149,8 +167,9 @@ class Server(Loggable):
                             continue
                     except:
                         self.fail(message, "Malformed message")
-                        self.error("Uncaught exception: {}"
-                                .format(traceback.format_exc()))
+                        self.error(
+                            "Uncaught exception: {}".format(traceback.format_exc())
+                        )
                         continue
 
                     self.__isocket.send_string(reply)
@@ -181,6 +200,7 @@ class Server(Loggable):
 
         self.info("Server stopped")
 
+
 def echo(server, message):
     """
     Echo the message back to the client
@@ -189,8 +209,10 @@ def echo(server, message):
     server.broadcast(message)
     return message
 
+
 def stop_server(sig, frame, server):
     server.stop()
+
 
 if __name__ == "__main__":
 
@@ -199,16 +221,17 @@ if __name__ == "__main__":
     logging.getLogger(__name__).info("Hello yes this is a test")
 
     # Set up the server
-    s = Server("tcp://127.0.0.1:5000", "tcp://127.0.0.1:6667",
-            logging.getLogger("server"),
-            Log(sys.stderr))
+    s = Server(
+        "tcp://127.0.0.1:5000",
+        "tcp://127.0.0.1:6667",
+        logging.getLogger("server"),
+        Log(sys.stderr),
+    )
 
     if not DEBUG:
-        signal.signal(signal.SIGINT , lambda sig, f: stop_server(sig, f, s))
+        signal.signal(signal.SIGINT, lambda sig, f: stop_server(sig, f, s))
         signal.signal(signal.SIGQUIT, lambda sig, f: stop_server(sig, f, s))
         signal.signal(signal.SIGTERM, lambda sig, f: stop_server(sig, f, s))
 
-
     # Start listening
     s.start_background(echo)
-

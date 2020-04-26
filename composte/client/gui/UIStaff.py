@@ -1,11 +1,9 @@
-
-
 from PyQt5 import QtWidgets, QtCore
 from client.gui.UIMeasure import UIMeasure
 import client.gui.UISettings as UISet
 
-class UIStaff(QtWidgets.QGraphicsItemGroup):
 
+class UIStaff(QtWidgets.QGraphicsItemGroup):
     def __init__(self, measureList, startMeasure, endMeasure, *args, **kwargs):
         """
         :param measureLists: A list of lists of measures, each containing at
@@ -37,8 +35,9 @@ class UIStaff(QtWidgets.QGraphicsItemGroup):
         Return the time length of this staff, i.e. the time between the first
         beat of this line and the first beat of the next one.
         """
-        return sum(map(length(self.__measures[self.__startMeasure
-                                              :self.__endMeasure])))
+        return sum(
+            map(length(self.__measures[self.__startMeasure : self.__endMeasure]))
+        )
 
     def boundingRect(self):
         """
@@ -52,7 +51,9 @@ class UIStaff(QtWidgets.QGraphicsItemGroup):
         y = childBoundRect.y()
         width = childBoundRect.width()
         height = childBoundRect.height()
-        return QtCore.QRectF(x - UISet.STAFF_X_PAD,
-                             y - UISet.STAFF_Y_PAD,
-                             width + 2 * UISet.STAFF_X_PAD,
-                             height + 2 * UISet.STAFF_Y_PAD)
+        return QtCore.QRectF(
+            x - UISet.STAFF_X_PAD,
+            y - UISet.STAFF_Y_PAD,
+            width + 2 * UISet.STAFF_X_PAD,
+            height + 2 * UISet.STAFF_Y_PAD,
+        )

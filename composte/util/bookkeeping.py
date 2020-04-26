@@ -1,4 +1,3 @@
-
 class Pool:
     """
     Pool objects to hopefully reduce the number of copies floating around in
@@ -36,6 +35,7 @@ class Pool:
 
         return count - 1
 
+
 class ProjectPool:
     """
     Pool Composte projects in memory
@@ -47,7 +47,7 @@ class ProjectPool:
     def __init__(self):
         pass
 
-    def put(self, uuid, constructor = None):
+    def put(self, uuid, constructor=None):
         """
         Fetch a project and bump its refcount. When the requested project is
         not cached, invoke constructor if possible and cache the result.
@@ -65,7 +65,7 @@ class ProjectPool:
         ProjectPool.__objects[uuid] = (proj, count + 1)
         return proj
 
-    def remove(self, uuid, on_removal = lambda x: x):
+    def remove(self, uuid, on_removal=lambda x: x):
         """
         Un-use a project, running on_removal with the project as the only
         argumargument when the reference is removed
@@ -90,4 +90,3 @@ class ProjectPool:
         """
         for pid, (proj, count) in ProjectPool.__objects.items():
             mapfun(proj, count)
-

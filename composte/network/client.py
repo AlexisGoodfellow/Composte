@@ -9,6 +9,7 @@ from network.base.loggable import Loggable, DevNull
 from threading import Thread, Lock
 from queue import Queue
 
+
 class Subscription(Loggable):
     def __init__(self, remote_address, zmq_context, logger):
         """
@@ -29,7 +30,7 @@ class Subscription(Loggable):
         self.__backlog = Queue(1024)
         self.__lock = Lock()
 
-    def recv(self, poll_timeout = 500):
+    def recv(self, poll_timeout=500):
         """
         Subscription.recv(self, poll_timeout = 500)
         Retrieve a message, failing with return value None after poll_timeout
@@ -62,11 +63,14 @@ class Subscription(Loggable):
             self.__socket.disconnect(self.__addr)
             self.__socket.close()
 
+
 # For legacy reasons, broadcast handler is separate: Subscription.
 class Client(Loggable):
     __context = zmq.Context()
-    def __init__(self, remote_address, broadcast_address,
-            logger, encryption_scheme = Encryption()):
+
+    def __init__(
+        self, remote_address, broadcast_address, logger, encryption_scheme=Encryption()
+    ):
         """
         Client.__init__(self, remote_address, broadcast_address,
             logger, encryption_scheme = Encryption())
@@ -86,13 +90,12 @@ class Client(Loggable):
         # Receive broadcasts
         self.__done = False
         self.__background = None
-        self.__listener = Subscription(broadcast_address, self.__context,
-                logger)
+        self.__listener = Subscription(broadcast_address, self.__context, logger)
 
         self.__lock = Lock()
         self.__background_lock = Lock()
 
-    def send(self, message, preprocess = lambda x: x):
+    def send(self, message, preprocess=lambda x: x):
         """
         Client.send(self, message, preprocess = lambda msg: msg)
         Send a message down the interactive socket, blocking until a reply is
@@ -122,8 +125,9 @@ class Client(Loggable):
     def resume_background(self):
         self.__background_lock.release()
 
-    def __listen_almost_forever(self, handler, preprocess = lambda x: x,
-            poll_timeout = 500):
+    def __listen_almost_forever(
+        self, handler, preprocess=lambda x: x, poll_timeout=500
+    ):
         """
         Client.__listen_almost_forever(self, handler,
             preprocess = lambda msg: msg, poll_timeout = 500)
@@ -132,7 +136,8 @@ class Client(Loggable):
         """
         while True:
             with self.__lock:
-                if self.__done: break
+                if self.__done:
+                    break
 
             # Don't allow pausing halfway through a message
             with self.__background_lock:
@@ -160,8 +165,7 @@ class Client(Loggable):
 
         self.__listener.stop()
 
-    def start_background(self, handler, preprocess = lambda x: x,
-            poll_timeout = 500):
+    def start_background(self, handler, preprocess=lambda x: x, poll_timeout=500):
         """
         Client.start_background(self, handler, preprocess = lambda msg: msg,
             poll_timeout = 500)
@@ -173,9 +177,10 @@ class Client(Loggable):
             if self.__background != None:
                 return
 
-            self.__background = \
-            Thread(target = self.__listen_almost_forever,
-                    args = (handler, preprocess, poll_timeout))
+            self.__background = Thread(
+                target=self.__listen_almost_forever,
+                args=(handler, preprocess, poll_timeout),
+            )
 
             self.__background.start()
 
@@ -196,18 +201,19 @@ class Client(Loggable):
 
         self.info("Client stopped")
 
+
 def echo(server, message):
     return message
+
 
 def id(pre, elem):
     return pre + elem
 
+
 if __name__ == "__main__":
     # Set up the servers
-    s1 = Client("tcp://127.0.0.1:5000", "tcp://127.0.0.1:5001", DevNull,
-            Encryption())
-    s2 = Client("tcp://127.0.0.1:5000", "tcp://127.0.0.1:5001", DevNull,
-            Encryption())
+    s1 = Client("tcp://127.0.0.1:5000", "tcp://127.0.0.1:5001", DevNull, Encryption())
+    s2 = Client("tcp://127.0.0.1:5000", "tcp://127.0.0.1:5001", DevNull, Encryption())
 
     # Start broadcast handlers
     s1.start_background(echo, lambda m: id("1: ", m), 500)
@@ -224,4 +230,3 @@ if __name__ == "__main__":
     # Stop the clients
     s1.stop()
     s2.stop()
-

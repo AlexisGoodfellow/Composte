@@ -1,6 +1,6 @@
-
 import time
 from threading import Thread
+
 
 def every(delay_in_seconds, timer_resolution, fun, continue_predicate):
     """
@@ -22,7 +22,6 @@ def every(delay_in_seconds, timer_resolution, fun, continue_predicate):
                 t1 = time.clock_gettime(time.CLOCK_REALTIME)
                 fun()
 
-    thread = Thread(target = go)
+    thread = Thread(target=go)
     thread.start()
     return thread
-

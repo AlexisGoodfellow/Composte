@@ -11,8 +11,10 @@ from network.base.exceptions import GenericError
 import music21
 import json
 
-def performMusicFun(projectID, fname, args, partIndex=None, offset=None,
-        fetchProject=None):
+
+def performMusicFun(
+    projectID, fname, args, partIndex=None, offset=None, fetchProject=None
+):
     """ Wrapper for all music functions, where the
         name of the function to be called (as a string)
         is the first argument, and the arguments to the
@@ -21,7 +23,8 @@ def performMusicFun(projectID, fname, args, partIndex=None, offset=None,
     # for ease of use
     project = fetchProject(projectID)
     args = json.loads(args)
-    if fname == "chat": return ("ok", "") # Why not make a chat server too?
+    if fname == "chat":
+        return ("ok", "")  # Why not make a chat server too?
 
     def unpackFun(fname, args):
         """ Determines which function to call and
@@ -32,48 +35,46 @@ def performMusicFun(projectID, fname, args, partIndex=None, offset=None,
             else:
                 musicObject = project.parts
 
-            if fname == 'changeKeySignature':
-                return (musicFuns.changeKeySignature, [float(args[0]),
-                        musicObject, int(args[2])])
-            elif fname == 'insertNote':
-                return (musicFuns.insertNote, [float(args[0]),
-                        musicObject, args[2], float(args[3])])
-            elif fname == 'removeNote':
-                return (musicFuns.removeNote, [float(args[0]),
-                        musicObject, args[2]])
-            elif fname == 'insertMetronomeMark':
-                return (musicFuns.insertMetronomeMark, [float(args[0]),
-                        musicObject, int(args[1])])
-            elif fname == 'removeMetronomeMark':
-                return (musicFuns.removeMetronomeMark, [float(args[0]),
-                        musicObject])
-            elif fname == 'transpose':
-                return (musicFuns.transpose, [musicObject,
-                        int(args[1])])
-            elif fname == 'insertClef':
-                return (musicFuns.insertClef, [float(args[0]),
-                        musicObject, args[2]])
-            elif fname == 'removeClef':
-                return (musicFuns.removeClef, [float(args[0]),
-                        musicObject])
-            elif fname == 'insertMeasures':
-                return (musicFuns.insertMeasures, [float(args[0]),
-                        musicObject, float(args[2])])
-            elif fname == 'addInstrument':
-                return (musicFuns.addInstrument, [float(args[0]),
-                        musicObject, args[2]])
-            elif fname == 'removeInstrument':
-                return (musicFuns.removeInstrument, [float(args[0]),
-                        musicObject])
-            elif fname == 'addDynamic':
-                return (musicFuns.addDynamic, [float(args[0]),
-                        musicObject, args[2]])
-            elif fname == 'removeDynamic':
-                return (musicFuns.removeDynamic, [float(args[0]),
-                        musicObject])
-            elif fname == 'addLyric':
-                return (musicFuns.addLyric, [float(args[0]),
-                        musicObject, args[2]])
+            if fname == "changeKeySignature":
+                return (
+                    musicFuns.changeKeySignature,
+                    [float(args[0]), musicObject, int(args[2])],
+                )
+            elif fname == "insertNote":
+                return (
+                    musicFuns.insertNote,
+                    [float(args[0]), musicObject, args[2], float(args[3])],
+                )
+            elif fname == "removeNote":
+                return (musicFuns.removeNote, [float(args[0]), musicObject, args[2]])
+            elif fname == "insertMetronomeMark":
+                return (
+                    musicFuns.insertMetronomeMark,
+                    [float(args[0]), musicObject, int(args[1])],
+                )
+            elif fname == "removeMetronomeMark":
+                return (musicFuns.removeMetronomeMark, [float(args[0]), musicObject])
+            elif fname == "transpose":
+                return (musicFuns.transpose, [musicObject, int(args[1])])
+            elif fname == "insertClef":
+                return (musicFuns.insertClef, [float(args[0]), musicObject, args[2]])
+            elif fname == "removeClef":
+                return (musicFuns.removeClef, [float(args[0]), musicObject])
+            elif fname == "insertMeasures":
+                return (
+                    musicFuns.insertMeasures,
+                    [float(args[0]), musicObject, float(args[2])],
+                )
+            elif fname == "addInstrument":
+                return (musicFuns.addInstrument, [float(args[0]), musicObject, args[2]])
+            elif fname == "removeInstrument":
+                return (musicFuns.removeInstrument, [float(args[0]), musicObject])
+            elif fname == "addDynamic":
+                return (musicFuns.addDynamic, [float(args[0]), musicObject, args[2]])
+            elif fname == "removeDynamic":
+                return (musicFuns.removeDynamic, [float(args[0]), musicObject])
+            elif fname == "addLyric":
+                return (musicFuns.addLyric, [float(args[0]), musicObject, args[2]])
             else:
                 return (None, None)
         except ValueError as e:
@@ -84,14 +85,14 @@ def performMusicFun(projectID, fname, args, partIndex=None, offset=None,
     if (function, arguments) == (None, None):
         return ("fail", "INVALID OPERATION")
 
-    if offset is not None and offset != 'None':
+    if offset is not None and offset != "None":
         if float(offset) < 0.0:
             raise GenericError
 
     # Last-minute note length validation hack
-    legalLengths = [4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.375, 0.25]    
-    if fname == "insertNote": 
-        if arguments[3] not in legalLengths: 
+    legalLengths = [4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.375, 0.25]
+    if fname == "insertNote":
+        if arguments[3] not in legalLengths:
             return ("fail", "INVALID NOTE LENGTH")
 
     try:
@@ -101,4 +102,3 @@ def performMusicFun(projectID, fname, args, partIndex=None, offset=None,
 
     # End error handling
     return ("ok", updateOffsets)
-
