@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: composte:latest
+      - image: alexisegoodfellow/composte:latest
     working_directory: /app
 
     environment:
