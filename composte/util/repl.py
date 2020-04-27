@@ -604,4 +604,3 @@ def the_worst_repl_you_will_ever_see(
             res = str(res)
 
     return res
-

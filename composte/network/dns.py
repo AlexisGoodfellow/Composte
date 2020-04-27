@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """DNS lookup utility."""
 
-import socket
 import logging
-from typing import List, Tuple, Any
+import socket
+from typing import Any, List, Tuple
 
 logger = logging.getLogger(__name__)
 

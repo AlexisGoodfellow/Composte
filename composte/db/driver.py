@@ -7,6 +7,7 @@ import uuid
 from threading import Lock
 from typing import Optional
 
+
 # We are inspired by Django, but we're not that good at introspection/reflection
 def get_connection(dbname: str):
     """
@@ -20,6 +21,7 @@ def get_connection(dbname: str):
     conn.execute('PRAGMA foreign_keys = "1"')  # ಠ_ಠ
     conn.commit()
     return conn
+
 
 # TODO: Make me and projects dataclasses
 class User:
@@ -263,4 +265,3 @@ if __name__ == "__main__":
 
     own.put("shark meldon", id_1)
     own.put("shark meldon", id_2)
-

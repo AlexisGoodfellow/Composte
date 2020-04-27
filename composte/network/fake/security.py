@@ -41,4 +41,3 @@ class Log:
     def decrypt(self, message: str) -> str:
         """Decrypt logs when fetching from the sink."""
         return self.log(message)
-

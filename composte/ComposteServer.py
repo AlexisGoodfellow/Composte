@@ -530,4 +530,3 @@ if __name__ == "__main__":
     signal.signal(signal.SIGQUIT, lambda sig, f: stop_server(sig, f, s))
     signal.signal(signal.SIGTERM, lambda sig, f: stop_server(sig, f, s))
     signal.signal(signal.SIGHUP, lambda sig, f: stop_server(sig, f, s))
-
