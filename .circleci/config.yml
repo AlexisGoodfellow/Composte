@@ -59,11 +59,11 @@ jobs:
       #     name: mypy
       #     command: |
       #       mypy . | tee ${TEST_RESULTS}/mypy.out
-      #
-      # - run:
-      #     name: pydocstyle
-      #     command: |
-      #       pydocstyle composte tests | tee ${TEST_RESULTS}/pydoc.out
+
+      - run:
+          name: pydocstyle
+          command: |
+            pydocstyle composte tests | tee ${TEST_RESULTS}/pydoc.out
 
       # - deploy:
       #     name: Build and push Docker image

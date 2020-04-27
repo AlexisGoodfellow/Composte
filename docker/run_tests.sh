@@ -20,4 +20,4 @@ echo "Starting import sorting..."
 isort --recursive --apply composte tests
 
 echo "Starting pydocstyle..."
-# pydocstyle composte tests
+pydocstyle composte tests

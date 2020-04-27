@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Client for connecting to composte servers."""
 
 import json
 import shlex
@@ -87,8 +88,9 @@ class ComposteClient(QtCore.QObject):
 
     def pause_updates(self):
         """
-        Prevent incoming updates from being applied, queuing them up. Blocks
-        until all updates currently being processed have completed.
+        Prevent incoming updates from being applied, queuing them up.
+
+        Blocks until all updates currently being processed have completed.
         """
         self.__client.pause_background()
 
@@ -148,8 +150,7 @@ class ComposteClient(QtCore.QObject):
 
         try:
             return util.musicWrapper.performMusicFun(*args, fetchProject=project)
-
-        except:
+        except Exception:
             print(traceback.format_exc())
             return ("fail", "error")
 
@@ -203,7 +204,7 @@ class ComposteClient(QtCore.QObject):
             print(reply)
         try:
             return server.deserialize(reply)
-        except:
+        except Exception:
             print(reply)
             return ("fail", "Mangled reply")
 
@@ -283,11 +284,11 @@ class ComposteClient(QtCore.QObject):
         self.__tts = not self.__tts
 
     def ttsOn(self):
-        """Turns text-to-speech on if it is availible."""
+        """Turn text-to-speech on if it is availible."""
         self.__tts = True
 
     def ttsOff(self):
-        """Turns text-to-speech off."""
+        """Turn text-to-speech off."""
         self.__tts = False
 
     def changeKeySignature(self, project_id, offset, partIndex, newSigSharps):
