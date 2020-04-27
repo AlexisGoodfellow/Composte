@@ -2,8 +2,7 @@
 """Composte network server."""
 
 import logging
-# Need signal handlers to properly run as daemon
-import signal
+import signal  # Need signal handlers to properly run as daemon
 import sys
 import traceback
 from threading import Lock, Thread
@@ -16,20 +15,22 @@ from composte.network.base.loggable import Loggable
 from composte.network.conf import logging as log
 from composte.network.fake.security import Encryption, Log
 
-# A REP socket replies to the client who sent the last message. This means
-# that we can't really get away with worker threads here, as
-# REQ/Processing/REP must be serialized as a cohesive unit. This problem seems
-# to be generally tractable though, per
-# https://stackoverflow.com/questions/29420666/zmq-multiple-request-reply-pairs
-
-
 DEBUG = False
 
 
-# Broadcast socket   -> Publish/Subscribe
-# Interactive socket -> Request/Reply
 class Server(Loggable):
-    """The network server for composte."""
+    """
+    The network server for composte.
+
+    Broadcast socket   -> Publish/Subscribe
+    Interactive socket -> Request/Reply
+
+    A REP socket replies to the client who sent the last message. This means
+    that we can't really get away with worker threads here, as
+    REQ/Processing/REP must be serialized as a cohesive unit. This problem seems
+    to be generally tractable though, per
+    https://stackoverflow.com/questions/29420666/zmq-multiple-request-reply-pairs
+    """
 
     __context = zmq.Context()
 
@@ -41,7 +42,7 @@ class Server(Loggable):
         encryption_scheme=Encryption(),
     ):
         """
-        The network server for Composte.
+        Initialize the network server for Composte.
 
         interactive_address and broadcast_address must be available for this
         application to bind to.
