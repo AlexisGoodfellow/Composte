@@ -5,19 +5,19 @@ set -e
 pytest tests --cov-report html
 
 echo "Running MyPy"
-mypy .
+mypy composte tests
 
 echo "Starting Black..."
 black --quiet composte tests
 
 echo "Starting flake8..."
-flake8 .
+flake8 composte tests
 
 echo "Starting bandit..."
-bandit -r .
+bandit -r composte
 
 echo "Starting import sorting..."
-isort --recursive --apply .
+isort --recursive --apply composte tests
 
 echo "Starting pydocstyle..."
 pydocstyle composte tests
