@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
+"""This file provides what is quite possibly the world's worst REPL.
 
-# This file provides what is quite possibly the world's worst REPL. Some
-# docstrings are shoehorned into being used as interactive REPL help, so it
-# is not possible to give them more useful docstrings. Mark, I apologize in
-# advance for the pain that attempting to understand the contents of this file
-# will cause you.
+Some docstrings are shoehorned into being used as interactive REPL help, so it
+is not possible to give them more useful docstrings. I apologize in advance
+for the pain that attempting to understand the contents of this file will cause you.
+"""
 
 import inspect
 import json
-import os
-import re
-import sys
 import time
 
 DEBUG = True
@@ -21,9 +18,7 @@ class SyntaxError(Exception):
 
 
 def I_dont_know_what_you_want_me_to_do(*args):
-    """
-    Unknown command
-    """
+    """Unknown command."""
     print("Unknown command")
 
 
@@ -118,9 +113,10 @@ def echo(*args):
 
 class REPL_env:
     """
-    Literally a wrapper around a python dictionary. Could be done better if I
-    wanted to chain REPL bindings correctly, but I'm lazy and this is low
-    priority.
+    Literally a wrapper around a python dictionary.
+
+    Could be done better if I wanted to chain REPL bindings correctly,
+    but I'm lazy and this is low priority.
     """
 
     def __init__(self):
@@ -144,7 +140,7 @@ class REPL_env:
         try:
             val = self.__bindings[name]
             del self.__bindings[name]
-        except KeyError as e:
+        except KeyError:
             pass
         return val
 
@@ -156,7 +152,7 @@ class REPL_env:
         """
         try:
             return self.__bindings[name]
-        except KeyError as e:
+        except KeyError:
             return ""
 
 
@@ -608,3 +604,4 @@ def the_worst_repl_you_will_ever_see(
             res = str(res)
 
     return res
+

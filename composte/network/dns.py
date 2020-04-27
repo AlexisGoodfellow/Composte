@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
+"""DNS lookup utility."""
 
 import socket
 import logging
+from typing import List, Tuple, Any
 
 logger = logging.getLogger(__name__)
 
+# family, type, proto, canonname, sockaddr
+# IPV4 vs. (IPV6)
+# sockaddr is: ip_address, port, (flow_info, scope_id)
+AddrInfoType = List[Tuple[int, int, int, str, Tuple[Any, ...]]]
 
-def lookup(name, port):
+
+def lookup(name, port) -> AddrInfoType:
     """
-    Look up a lot information about a remote address.
+    Look up a lot of information about a remote address.
 
     Probably does some sort of DNS query.
     """
@@ -16,7 +23,7 @@ def lookup(name, port):
     return ret
 
 
-def ip(name, port=80):
+def ip(name: str, port: int = 80) -> str:
     """Get the ip associated with a remote address."""
     return lookup(name, port)[0][4][0]
 

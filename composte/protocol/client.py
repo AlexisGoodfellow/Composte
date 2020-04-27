@@ -17,7 +17,7 @@ def serialize(function_name: str, *args: List[str]) -> str:
     return json.dumps(rpc)
 
 
-def deserialize(msg: str) -> Dict[Any, Any]:
+def deserialize(msg: str) -> Dict[str, Any]:
     """
     Deserialize a message received from a client as a dictionary.
 
