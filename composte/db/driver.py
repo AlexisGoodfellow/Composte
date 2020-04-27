@@ -3,48 +3,53 @@
 
 import json
 import sqlite3
+import uuid
 from threading import Lock
+from typing import Optional
 
-# We are inspired by Django, but we're not that good at
-# introspection/reflection
-
-# ._.
-def get_connection(dbname):
+# We are inspired by Django, but we're not that good at introspection/reflection
+def get_connection(dbname: str):
     """
-    Open a databse connection and make sure that foreign key constraints are
-    enabled for every connection, because they aren't by default and for some
-    reason that can be changed _per connection_.
+    Open a databse connection.
+
+    Make sure that foreign key constraints are enabled for every connection,
+    because they aren't by default and for some reason that can be changed
+    _per connection_.
     """
     conn = sqlite3.connect(dbname)
     conn.execute('PRAGMA foreign_keys = "1"')  # ಠ_ಠ
     conn.commit()
     return conn
 
-
+# TODO: Make me and projects dataclasses
 class User:
-    """
-    POD class representing users
-    """
+    """POD class representing users."""
 
-    def __init__(self, uname=None, hash_=None, email=None):
+    def __init__(
+        self,
+        uname: Optional[str] = None,
+        hash_: Optional[str] = None,
+        email: Optional[str] = None,
+    ):
+        """Make this a dataclass."""
         self.uname = uname
         self.hash = hash_
         self.email = email
 
     def __str__(self):
+        """Stringify."""
         obj = {"type": "User", "id": self.id, "hash": self.hash, "email": self.email}
         return json.dumps(obj)
 
 
 class Auth:
-    """
-    CRU̶D̶ wrapper for an auth table in our database
-    """
+    """CRU̶D̶ wrapper for an auth table in our database."""
 
     # We're so bad at CRUD that we only bother to do half of it
     __blueprint = ("username", "hash", "email")
 
-    def __init__(self, dbname):
+    def __init__(self, dbname: str):
+        """Initialize the auth database."""
         self.__conn = get_connection(dbname)
         self.__cursor = self.__conn.cursor()
 
@@ -58,10 +63,8 @@ class Auth:
         self.__lock = Lock()
 
     # Create
-    def put(self, username, hash_, email="null"):
-        """
-        Create a new auth record
-        """
+    def put(self, username: str, hash_: str, email: str = "null"):
+        """Create a new auth record."""
         with self.__lock:
             self.__cursor.execute(
                 """
@@ -73,10 +76,8 @@ class Auth:
             self.__conn.commit()
 
     # Retrieve
-    def get(self, username):
-        """
-        Attempt to retrieve an existing auth record
-        """
+    def get(self, username: str):
+        """Attempt to retrieve an existing auth record."""
         self.__cursor.execute(
             """
                 SELECT * FROM auth WHERE username=?
@@ -90,34 +91,30 @@ class Auth:
 
 
 class Project:
-    """
-    POD class holding enough information to get to and identify composte
-    projects
-    """
+    """Dataclass holding enough information identify composte projects."""
 
     def __init__(self, id_=None, name=None, owner=None):
+        """Make this a dataclass."""
         self.id = id_
         self.name = name
         self.owner = owner
 
     def __str__(self):
-        obj = {"type": "Project", "id": self.id, "name": self.name, "owner": self.owner}
+        """Stringify."""
         return """{{ "type": "Project", "id": {}, "name": {}, "owner": {} }}""".format(
             str(self.id), self.name, self.owner
         )
-        # return json.dumps(obj)
 
 
 # Project storage path is always
 #   //<owner>/<id>.{meta,proj}
 class Projects:
-    """
-    CRU̶D̶ wrapper for a project table in our database
-    """
+    """CRU̶D̶ wrapper for a project table in our database."""
 
     __blueprint = ("id", "name", "owner")
 
-    def __init__(self, dbname):
+    def __init__(self, dbname: str):
+        """Initialize the project database."""
         self.__conn = get_connection(dbname)
         self.__cursor = self.__conn.cursor()
 
@@ -133,10 +130,8 @@ class Projects:
 
         self.__lock = Lock()
 
-    def put(self, id_, name, owner):
-        """
-        Insert a project record
-        """
+    def put(self, id_: uuid.UUID, name: str, owner: str) -> None:
+        """Insert a project record."""
         with self.__lock:
             self.__cursor.execute(
                 """
@@ -147,10 +142,8 @@ class Projects:
             )
             self.__conn.commit()
 
-    def get(self, id_):
-        """
-        Retrieve a project record
-        """
+    def get(self, id_: uuid.UUID):
+        """Retrieve a project record."""
         self.__cursor.execute(
             """
                 SELECT * FROM projects WHERE id=?
@@ -164,11 +157,10 @@ class Projects:
 
 
 class Contributors:
-    """
-    CRU̶D̶ wrapper around contributor relationships between Users and Projects
-    """
+    """CRU̶D̶ wrapper around contributor relationships between Users and Projects."""
 
-    def __init__(self, dbname):
+    def __init__(self, dbname: str):
+        """Initialize contributor database."""
         self.__conn = get_connection(dbname)
         self.__cursor = self.__conn.cursor()
 
@@ -183,11 +175,11 @@ class Contributors:
 
         self.__lock = Lock()
 
-    def put(self, username, project_id):
+    def put(self, username: str, project_id: uuid.UUID) -> None:
         """
-        Add a new contributor relationship
-        Or equivalently,
-        Declare that username is a contributor to project_id
+        Add a new contributor relationship.
+
+        Equivalent to declaring that a username is a contributor to project_id
         """
         self.__cursor.execute(
             """
@@ -198,10 +190,13 @@ class Contributors:
         )
         self.__conn.commit()
 
-    def get(self, username=None, project_id=None):
+    def get(
+        self, username: Optional[str] = None, project_id: Optional[uuid.UUID] = None
+    ):
         """
-        Retrieve users contributing to a given project or projects
-        contributable by a given user.
+        Retrieve users contributing to a given project.
+
+        Alternatively, retrieve projects contributable by a given user.
         """
         # What are you even doing at this point?
         if username is None and project_id is None:
@@ -216,10 +211,8 @@ class Contributors:
         # ??????
         return None
 
-    def get_users(self, project_id):
-        """
-        Retrieve users who are contributors to the project
-        """
+    def get_users(self, project_id: Optional[uuid.UUID]):
+        """Retrieve users who are contributors to the project."""
         with self.__lock:
             self.__cursor.execute(
                 """
@@ -231,10 +224,8 @@ class Contributors:
             users = self.__cursor.fetchall()
             return [User(*user) for user in users]
 
-    def get_projects(self, username):
-        """
-        Retrieve projects that the user can contribute to
-        """
+    def get_projects(self, username: Optional[str]):
+        """Retrieve projects that the user can contribute to."""
         with self.__lock:
             self.__cursor.execute(
                 """
@@ -254,7 +245,7 @@ if __name__ == "__main__":
 
     try:
         os.remove("composte.db")
-    except:
+    except Exception:
         pass
 
     auth = Auth("compose.db")
@@ -264,10 +255,12 @@ if __name__ == "__main__":
     auth.put("shark meldon", "there", "hello@composte.me")
     auth.put("save me", "whee", "saveme@composte.me")
 
-    proj.put("1", "a", "save me")
-    proj.put("2", "b", "shark meldon")
+    id_1 = uuid.uuid4()
+    id_2 = uuid.uuid4()
 
-    own.put("shark meldon", "1")
-    own.put("shark meldon", "2")
+    proj.put(id_1, "a", "save me")
+    proj.put(id_2, "b", "shark meldon")
 
-    # own.put("not", "real")
+    own.put("shark meldon", id_1)
+    own.put("shark meldon", id_2)
+
