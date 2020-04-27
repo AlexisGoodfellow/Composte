@@ -303,18 +303,28 @@ class ComposteClient(QtCore.QObject):
     def insertNote(self, project_id, offset, partIndex, pitch, duration):
         """Insert a note into the score."""
         return self.update(
-            project_id, "insertNote", (offset, partIndex, pitch, duration), partIndex, offset
+            project_id,
+            "insertNote",
+            (offset, partIndex, pitch, duration),
+            partIndex,
+            offset,
         )
 
     def removeNote(self, project_id, offset, partIndex, removedNoteName):
         """Remove a note from the score."""
         return self.update(
-            project_id, "removeNote", (offset, partIndex, removedNoteName), partIndex, offset
+            project_id,
+            "removeNote",
+            (offset, partIndex, removedNoteName),
+            partIndex,
+            offset,
         )
 
     def insertMetronomeMark(self, project_id, offset, bpm):
         """Insert a metronome mark into the score."""
-        return self.update(project_id, "insertMetronomeMark", (offset, bpm), None, offset)
+        return self.update(
+            project_id, "insertMetronomeMark", (offset, bpm), None, offset
+        )
 
     def removeMetronomeMark(self, project_id, offset):
         """Remove a metronome mark from the score."""
@@ -322,7 +332,9 @@ class ComposteClient(QtCore.QObject):
 
     def transpose(self, project_id, partIndex, semitones):
         """Transpose a part by an integer number of semitones."""
-        return self.update(project_id, "transpose", (partIndex, semitones), partIndex, None)
+        return self.update(
+            project_id, "transpose", (partIndex, semitones), partIndex, None
+        )
 
     def insertClef(self, project_id, offset, partIndex, clefStr):
         """Insert a clef into the score."""
@@ -332,7 +344,9 @@ class ComposteClient(QtCore.QObject):
 
     def removeClef(self, project_id, offset, partIndex):
         """Remove a clef from the score."""
-        return self.update(project_id, "removeClef", (offset, partIndex), partIndex, offset)
+        return self.update(
+            project_id, "removeClef", (offset, partIndex), partIndex, offset
+        )
 
     def insertMeasures(self, project_id, insertionOffset, partIndex, insertedQLs):
         """Insert measures into the score."""
@@ -347,7 +361,11 @@ class ComposteClient(QtCore.QObject):
     def addInstrument(self, project_id, offset, partIndex, instrumentStr):
         """Add an instrument to the score."""
         return self.update(
-            project_id, "addInstrument", (offset, partIndex, instrumentStr), partIndex, offset
+            project_id,
+            "addInstrument",
+            (offset, partIndex, instrumentStr),
+            partIndex,
+            offset,
         )
 
     def removeInstrument(self, project_id, offset, partIndex):
@@ -364,7 +382,9 @@ class ComposteClient(QtCore.QObject):
 
     def removeDynamic(self, project_id, offset, partIndex):
         """Remove a dynamic marking from the score."""
-        return self.update(project_id, "removeDynamic", (offset, partIndex), partIndex, offset)
+        return self.update(
+            project_id, "removeDynamic", (offset, partIndex), partIndex, offset
+        )
 
     def addLyric(self, project_id, offset, partIndex, lyric):
         """Attach a lyric to the score."""

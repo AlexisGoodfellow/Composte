@@ -35,43 +35,42 @@ jobs:
           command: |
             pytest tests --cov-report html | tee ${TEST_RESULTS}/pytest.out
 
-      - run:
-          name: bandit
-          command: |
-            bandit -r . | tee ${TEST_RESULTS}/bandit.out
+      # - run:
+      #     name: bandit
+      #     command: |
+      #       bandit -r . | tee ${TEST_RESULTS}/bandit.out
 
       - run:
           name: black
           command: |
             black --check composte tests | tee ${TEST_RESULTS}/black.out
 
-      - run:
-          name: flake8
-          command: |
-            flake8 . | tee ${TEST_RESULTS}/flake8.out
+      # - run:
+      #     name: flake8
+      #     command: |
+      #       flake8 . | tee ${TEST_RESULTS}/flake8.out
 
       - run:
           name: isort
           command: |
             isort --recursive --check-only . | tee ${TEST_RESULTS}/isort.out
 
-      - run:
-          name: mypy
-          command: |
-            mypy . | tee ${TEST_RESULTS}/mypy.out
-
-      - run:
-          name: pydocstyle
-          command: |
-            pydocstyle composte tests | tee ${TEST_RESULTS}/pydoc.out
+      # - run:
+      #     name: mypy
+      #     command: |
+      #       mypy . | tee ${TEST_RESULTS}/mypy.out
+      #
+      # - run:
+      #     name: pydocstyle
+      #     command: |
+      #       pydocstyle composte tests | tee ${TEST_RESULTS}/pydoc.out
 
       - deploy:
           name: Build and push Docker image
           command: |
             TAG="0.1.${CIRCLE_BUILD_NUM}"
-            docker build -t AlexisGoodfellow/composte:$TAG .
-            docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-            docker push AlexisGoodfellow/composte:$TAG
+            docker build -t alexisegoodfellow/composte:$TAG .
+            docker push alexisegoodfellow/composte:$TAG
 
       - store_artifacts:
           path: /tmp/test-results

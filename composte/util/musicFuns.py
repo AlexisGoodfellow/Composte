@@ -150,9 +150,7 @@ def insertMetronomeMark(
     return [offset, offset]
 
 
-def removeMetronomeMark(
-    offset: float, parts: List[music21.part.Part]
-) -> List[float]:
+def removeMetronomeMark(offset: float, parts: List[music21.part.Part]) -> List[float]:
     """Remove a metronome marking from all parts at a given offset."""
     for part in parts:
         markings = part.metronomeMarkBoundaries()
@@ -418,4 +416,3 @@ def boundedOffset(part, bounds):
     - endTime is the termination offset of the music21 object. """
     offs = part.offsetMap()
     return [x for x in offs if bounds[0] <= x.offset and x.endTime < bounds[1]]
-

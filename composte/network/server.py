@@ -218,4 +218,3 @@ if __name__ == "__main__":
 
     # Start listening
     s.start_background(echo)
-

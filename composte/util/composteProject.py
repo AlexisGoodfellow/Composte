@@ -102,4 +102,3 @@ def deserializeProject(serializedProject: Tuple[str, str, str]) -> ComposteProje
     reconstructed_metadata = json.loads(metadata)
     project_id = uuid.UUID(id_)
     return ComposteProject(reconstructed_metadata, reconstructed_parts, project_id)
-

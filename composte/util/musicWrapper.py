@@ -108,4 +108,3 @@ def performMusicFun(
 
     # End error handling
     return ("ok", updateOffsets)
-

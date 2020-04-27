@@ -232,4 +232,3 @@ if __name__ == "__main__":
     # Stop the clients
     s1.stop()
     s2.stop()
-
