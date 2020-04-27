@@ -1,6 +1,8 @@
 # Composte
 ## Get together to make bad music
 
+[![AlexisGoodfellow](https://circleci.com/gh/AlexisGoodfellow/Composte/tree/master.svg?style=svg)](https://circleci.com/gh/AlexisGoodfellow/Composte)
+
 *To our beloved professor:* Before you print out every single line of python
 source code in this repository, please run the following command before
 committing to your decision.
