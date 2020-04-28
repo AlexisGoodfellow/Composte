@@ -1,10 +1,13 @@
+"""Run a function on a timer."""
 import time
 from threading import Thread
 
 
 def every(delay_in_seconds, timer_resolution, fun, continue_predicate):
     """
-    Invoke a function with a delay of delay_in_seconds between the end of one
+    Invoke a function on an iterval.
+
+    There is a delay of delay_in_seconds between the end of one
     invocation and the start of the next. Invokes continue_predicate every
     timetimer_resolution seconds, allowing polling-lke behavior
     """

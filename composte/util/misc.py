@@ -9,7 +9,6 @@ class VersionNotFoundException(Exception):
 
 def get_version() -> str:
     """Try a couple ways of getting a git commit hash to use as a version number."""
-
     try:
         import git
 

@@ -1,10 +1,15 @@
+"""UI component for clefs."""
 import music21
 from PyQt5 import QtWidgets
 
 
 class UIClef(QtWidgets.QGraphicsItem):
+    """Represents a clef."""
+
     def __init__(self, baseline: music21.pitch.Pitch, *args, **kwargs):
         """
+        Initialize the clef.
+
         :param baseline: The pitch corresponding to the bottom line of the staff
             for the clef, as a music21 Pitch.
         """
@@ -12,12 +17,14 @@ class UIClef(QtWidgets.QGraphicsItem):
         self.__baseline = baseline
 
     def __eq__(self, clef):
+        """Compare clefs for equality."""
         return self.__baseline == clef.__baseline
 
     def position(self, pitch: music21.pitch.Pitch):
         """
-        Return the line index of the given pitch relative to the lowest staff
-        line in this clef.
+        Return the line index of the given pitch.
+
+        This is calculated relative to the lowest staff line in this clef.
 
         :param pitch: Pitch whose position is being checked
 
@@ -27,17 +34,16 @@ class UIClef(QtWidgets.QGraphicsItem):
         return pitch.diatonicNoteNum - self.__baseline.diatonicNoteNum
 
 
-# END class UIClef
-
-
 def treble():
+    """Treble clef."""
     return UIClef(music21.pitch.Pitch("E4"))
 
 
 def fromMusic21(cl: music21.clef.Clef):
     """
-    Given a Music21 clef, return the corresponding graphics clef.  If it is an
-    unsupported clef, raise a RuntimeError.
+    Given a Music21 clef, return the corresponding graphics clef.
+
+    If it is an unsupported clef, raise a RuntimeError.
     """
     if isinstance(cl, music21.clef.TrebleClef):
         return treble()

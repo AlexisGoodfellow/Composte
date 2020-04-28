@@ -1,9 +1,10 @@
-# Wrapper for musicFuns.py
-# All json data is assumed to be deserialized by
-# the time these utility functions are invoked.
-# Furthermore, the project on which to perform
-# the desired function must have been determined
-# before these functions are called.
+"""
+Wrapper for musicFuns.py.
+
+All json data is assumed deserialized by the time these utility functions are invoked.
+Furthermore, the project on which to perform the desired function must have been
+determined before these functions are called.
+"""
 
 import json
 
@@ -17,7 +18,7 @@ def performMusicFun(
     projectID, fname, args, partIndex=None, offset=None, fetchProject=None
 ):
     """
-    Wrapper for all music functions.
+    Wrap all music functions.
 
     The name of the function to be called (as a string) is the first argument,
     and the arguments to the function (as a list) is the second.

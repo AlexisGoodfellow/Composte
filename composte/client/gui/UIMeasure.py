@@ -1,13 +1,14 @@
+"""UI Component for measures."""
 import music21
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsLineItem
 
 from client.gui import UISettings
-from client.gui.UINote import UINote
 
 
 class UIMeasure(QtWidgets.QGraphicsItemGroup):
+    """Represents the measure object."""
 
     __stafflineWidth = 1
     __barlineWidth = 2
@@ -33,6 +34,8 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
         **kwargs,
     ):
         """
+        Initialize the measure.
+
         :note: Most of the features related to drawing clef/keysig/timesig don't
         work correctly yet.
 
@@ -67,9 +70,7 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
         self.__initGraphics()
 
     def __initGraphics(self):
-        """
-        Draw in staff and bar lines.
-        """
+        """Draw in staff and bar lines."""
         for i in range(0, 5):
             line = QGraphicsLineItem(
                 0,
@@ -94,9 +95,7 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
         self.__baseObjs.append(barline)
 
     def clear(self):
-        """
-        Clear all graphics objects, except for the staff and bar lines.
-        """
+        """Clear all graphics objects, except for the staff and bar lines."""
         for item in self.__noteObjs.values():
             self.__scene.removeItem(item)
         self.__noteObjs.clear()
@@ -107,14 +106,13 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
 
     def __redraw(self):
         """
-        Redraw all graphics objects, moving them to update as necessary, e.g.
-        after a resize.
+        Redraw all graphics objects, moving them to update as necessary.
 
         :note: This does *not* update the existing notes from the underlying
         Music21 representation.
         """
-        ## TODO: This is a terrible way of doing this, we could reuse the old
-        ##   objects rather than destroying them and creating new ones.
+        # TODO: This is a terrible way of doing this, we could reuse the old
+        #   objects rather than destroying them and creating new ones.
         notes = list(self.__noteObjs.keys())
         self.clear()
 
@@ -124,8 +122,9 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
 
     def insertNote(self, pitch: music21.pitch.Pitch, ntype, offset: float):
         """
-        Insert a note into this measure.  Raises ValueError if the note extends
-        past the end of the measure.
+        Insert a note into this measure.
+
+        Raises ValueError if the note extends past the end of the measure.
 
         :param pitch: The pitch of the note to be inserted, as a music21 Pitch.
         :param ntype: The type of note to be inserted; this should be a subclass
@@ -150,8 +149,9 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
 
     def deleteNote(self, pitch: music21.pitch.Pitch, offset: float):
         """
-        Remove a note from this measure.  Return whether the note was
-        successfully removed.
+        Remove a note from this measure.
+
+        Return whether the note was successfully removed.
 
         :param pitch: The pitch of the note to be removed, as a music21 Pitch.
         :param offset: Quarter-note offset of the start of the note to be
@@ -169,37 +169,47 @@ class UIMeasure(QtWidgets.QGraphicsItemGroup):
 
     # Getters
     def clef(self):
+        """Get clef."""
         return self.__clef
 
     def keysig(self):
+        """Get key signature."""
         return self.__keysig
 
     def timesig(self):
+        """Get time signature."""
         return self.__timesig
 
     def width(self):
+        """Get width."""
         return self.__width
 
     # Setters
     def setClef(self, clef, newClef=True):
+        """Set clef."""
         self.__clef = clef
         self.__newClef = newClef
 
     def setKeysig(self, keysig, newKeysig=True):
+        """Set key signature."""
         self.__keysig = keysig
         self.__newKeysig = newKeysig
 
     def setTimesig(self, timesig, newTimesig=True):
+        """Set time signature."""
         self.__timesig = timesig
         self.__newTimesig = newTimesig
 
     def setWidth(self, width):
+        """Set width."""
         self.__width = width
         self.__redraw()
 
     def length(self):
         """
-        Return the time length of this staff, i.e. the time between the first
-        beat of this line and the first beat of the next one.
+        Return the time length of this staff.
+
+        This is the time between the first beat of this line
+        and the first beat of the next one.
         """
         return self.__timesig.measureLength()

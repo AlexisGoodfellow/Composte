@@ -1,3 +1,6 @@
+"""Bookkeeping functions."""
+
+
 class Pool:
     """
     Pool objects to hopefully reduce the number of copies floating around in memory.
@@ -8,9 +11,11 @@ class Pool:
     __objects = {}
 
     def __init__(self):
+        """Initialize the pool."""
         pass
 
     def put(self, tag, contructor):
+        """Put into the pool."""
         have = Pool.__objects.get(tag, None)
 
         if have is None:
@@ -22,6 +27,7 @@ class Pool:
         return Pool.__objects[tag]
 
     def remove(self, tag):
+        """Remove from the pool."""
         have = Pool.__objects.get(tag, None)
 
         if have is None:
@@ -39,19 +45,23 @@ class Pool:
 
 class ProjectPool:
     """
-    Pool Composte projects in memory
+    Pool Composte projects in memory.
+
     uuid -> (project, count)
     """
 
     __objects = {}
 
     def __init__(self):
+        """Initialize the project pool."""
         pass
 
     def put(self, uuid, constructor=None):
         """
-        Fetch a project and bump its refcount. When the requested project is
-        not cached, invoke constructor if possible and cache the result.
+        Fetch a project and bump its refcount.
+
+        When the requested project is not cached,
+        invoke constructor if possible and cache the result.
         """
         (proj, count) = ProjectPool.__objects.get(uuid, (None, 0))
 
@@ -68,8 +78,9 @@ class ProjectPool:
 
     def remove(self, uuid, on_removal=lambda x: x):
         """
-        Un-use a project, running on_removal with the project as the only
-        argumargument when the reference is removed
+        Un-use a project.
+
+        Runs on_removal with the project as an argument when the reference is removed.
         """
         (proj, count) = ProjectPool.__objects.get(uuid, (None, 0))
 
@@ -86,8 +97,9 @@ class ProjectPool:
 
     def map(self, mapfun):
         """
-        Apply a function to all cached projects. Adding or removing projects
-        during this process results in undefined behavior.
+        Apply a function to all cached projects.
+
+        Adding or removing projects during this process results in undefined behavior.
         """
         for pid, (proj, count) in ProjectPool.__objects.items():
             mapfun(proj, count)

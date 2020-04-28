@@ -1,3 +1,4 @@
+"""Define a Composte project."""
 import base64
 import json
 import uuid

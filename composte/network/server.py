@@ -88,7 +88,7 @@ class Server(Loggable):
         postprocess: Callable = lambda msg: msg,
         poll_timeout: int = 2000,
     ):
-        """Starts Server.__listen_almost_forever in the background."""
+        """Start Server.__listen_almost_forever in the background."""
         if self.__listen_thread is not None:
             return
         self.__listen_thread = Thread(
@@ -105,7 +105,7 @@ class Server(Loggable):
         poll_timeout: int = 2000,
     ):
         """
-        Polls for messages on the interactive socket until the server is stopped.
+        Poll for messages on the interactive socket until the server is stopped.
 
         poll_timeout controls how long a poll operation will wait before failing.
         Messages are pushed through the pipeline preprocess -> handler ->

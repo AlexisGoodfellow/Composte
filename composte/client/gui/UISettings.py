@@ -1,6 +1,4 @@
-"""
-Some general settings for the GUI.
-"""
+"""Some general settings for the GUI."""
 
 from PyQt5 import QtGui
 

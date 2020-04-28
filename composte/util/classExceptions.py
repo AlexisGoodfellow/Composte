@@ -12,7 +12,10 @@ class VirtualMethodError(NotImplementedError):
 
 
 def virtualmethod(fun):
+    """Create virtualmethod functionality."""
+
     def virt(self, *args, **kwargs):
+        """Throw virtual method error if not defined."""
         raise VirtualMethodError(type(self).__name__ + "." + fun.__name__)
 
     return virt

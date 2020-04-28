@@ -1,3 +1,5 @@
+"""Manipulations on music21 objects."""
+
 from typing import List
 
 import music21
@@ -109,7 +111,7 @@ def renameNote(note: music21.note.Note, hasSharps: bool):
 # NOT IN MINIMUM DELIVERABLE
 def changeTimeSignature(offset: float, part: music21.part.Part, newSigStr: str):
     """
-    Changes the Time Signature at a given offset inside a part.
+    Change the Time Signature at a given offset inside a part.
 
     newTimeSig must be a string for the new time signature, such as '4/4' or '6/8'.
     """
@@ -129,11 +131,13 @@ def insertMetronomeMark(
     """
     Insert a metronome marking in a list of parts at a given offset.
 
-    The constructor needs staff text as a string (empty for our purposes), pulses per
-    minute as an integer, and the duration in quarterLengths
-        of a single pulse as a float. Since duration
-        is 1.0, the second argument is exactly equivalent to
-        BPM (beats per minute). """
+    The constructor needs:
+        - staff text as a string (empty for our purposes)
+        - pulses per minute as an integer
+        - duration in quarterLengths of a single pulse as a float
+    Since duration is 1.0, the second argument is exactly equivalent to
+    BPM (beats per minute).
+    """
     mark = music21.tempo.MetronomeMark("", bpm, 1.0)
     for part in parts:
         markings = part.metronomeMarkBoundaries()
@@ -161,7 +165,7 @@ def removeMetronomeMark(offset: float, parts: List[music21.part.Part]) -> List[f
 
 
 def createNote(pitchName: str, durationInQLs: float) -> music21.note.Note:
-    """Creates a Note from the name of a pitch and a duration in quarter lengths."""
+    """Create a Note from the name of a pitch and a duration in quarter lengths."""
     note = music21.note.Note(pitchName)
     note.duration = music21.duration.Duration(durationInQLs)
     note.pitch.spellingIsInferred = False
@@ -212,7 +216,7 @@ def removeNote(offset, part, removedNoteName):
 
 def updateTieStatus(offset, part, noteName):
     """
-    Updates the tie status of a note with the name noteName at a given offset.
+    Update the tie status of a note with the name noteName at a given offset.
 
     The offset given to this function MUST be the same as the offset of the
     FIRST note in a legally tie-able pair of notes (the notes
@@ -297,7 +301,7 @@ def transpose(part, semitones):
 
 def insertClef(offset, part, clefStr):
     """
-    Inserts a new clef at a given offset in a given part.
+    Insert a new clef at a given offset in a given part.
 
     The types of clefs supported ON THE BACKEND are:
     'treble', 'treble8va', 'treble8vb, 'bass', 'bass8va',
@@ -366,7 +370,7 @@ def removeInstrument(offset, part):
 
 def addDynamic(offset, part, dynamicStr):
     """
-    Adds a dynamic marking to a part at a given offset.
+    Add a dynamic marking to a part at a given offset.
 
     Acceptable values of dynamicStr are 'ppp', 'pp', 'p',
     'mp', 'mf', 'f', 'ff', and 'fff'.
@@ -382,7 +386,7 @@ def addDynamic(offset, part, dynamicStr):
 
 
 def removeDynamic(offset, part):
-    """Removes a dynamic marking from a part at a given offset."""
+    """Remove a dynamic marking from a part at a given offset."""
     elems = part.getElementsByOffset(offset)
     for elem in elems:
         if hasattr(elem, "volumeScalar"):
@@ -408,11 +412,12 @@ def playback(part):
 
 def boundedOffset(part, bounds):
     """
-    Returns a bounded offset list for GUI uses.
+    Return a bounded offset list for GUI uses.
 
     An offset map is an (element, offset, endTime) triple.
     - element is the music21 object to insert.
     - offset is the insertion offset of the music21 object.
-    - endTime is the termination offset of the music21 object. """
+    - endTime is the termination offset of the music21 object.
+    """
     offs = part.offsetMap()
     return [x for x in offs if bounds[0] <= x.offset and x.endTime < bounds[1]]

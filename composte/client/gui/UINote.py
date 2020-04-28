@@ -6,19 +6,20 @@ not been a priority.
 """
 
 
+from typing import Optional
+
 import music21
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
 import client.gui.UISettings as UISet
-from util.classExceptions import virtualmethod
 
 
 def ntypeFromMusic21(note: music21.note.Note):
     """
-    Given a music21Note, return the class of a UINote which would have the
-    appropriate duration.  Raise a runtime error if the note is not of a length
-    that is supported.
+    Return the class of a UINote which would have the appropriate duration.
+
+    Raise a runtime error if the note is not of a length that is supported.
     """
     ntypeMap = {
         ("whole", 0): UINote_Whole,
@@ -38,10 +39,7 @@ def ntypeFromMusic21(note: music21.note.Note):
 
 
 class UINote(QtWidgets.QGraphicsItem):
-
-    """
-    A superclass for all graphics notes.
-    """
+    """A superclass for all graphics notes."""
 
     __accidentalLineWidth = 1.5
     __accidentalPen = QtGui.QPen(
@@ -52,9 +50,10 @@ class UINote(QtWidgets.QGraphicsItem):
     __dotBrush = QtGui.QBrush(QtGui.QColor(0, 0, 0), Qt.SolidPattern)
 
     # Overridden by subclasses
-    _length = None
+    _length: Optional[float] = None
 
     def __init__(self, pitch, clef, keysig, *args, **kwargs):
+        """Initialize the UINote."""
         super(UINote, self).__init__(*args, **kwargs)
         self.__pitch = pitch
         self.__clef = clef
@@ -66,16 +65,12 @@ class UINote(QtWidgets.QGraphicsItem):
         )
 
     @classmethod
-    def length(cls):
-        """
-        Return the length of the note, in quarter note increments.
-        """
+    def length(cls) -> Optional[float]:
+        """Return the length of the note, in quarter note increments."""
         return cls._length
 
     def boundingRect(self):
-        """
-        Return a rectangle enclosing the entire drawn object.
-        """
+        """Return a rectangle enclosing the entire drawn object."""
         y = self._yoffset
         return QtCore.QRectF(
             -3.5 * UISet.PITCH_LINE_SEP - 5,
@@ -85,9 +80,7 @@ class UINote(QtWidgets.QGraphicsItem):
         )
 
     def _paintAccidental(self, painter, option, widget):
-        """
-        Draw in accidental marks, if appropriate.
-        """
+        """Draw in accidental marks, if appropriate."""
         y = self._yoffset
         painter.setPen(self.__accidentalPen)
         painter.setBrush(self.__accidentalBrush)
@@ -163,9 +156,7 @@ class UINote(QtWidgets.QGraphicsItem):
             )
 
     def _paintDot(self, painter, option, widget):
-        """
-        Paint a dot on the current note.
-        """
+        """Paint a dot on the current note."""
         y = self._yoffset
         painter.setBrush(self.__dotBrush)
         painter.setPen(self.__dotPen)
@@ -177,10 +168,8 @@ class UINote(QtWidgets.QGraphicsItem):
         )
 
 
-## END class UINote
-
-
 class UINote_Whole(UINote):
+    """A whole note."""
 
     _length = 4.0
 
@@ -189,9 +178,11 @@ class UINote_Whole(UINote):
     __brush = QtGui.QBrush(Qt.NoBrush)
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Whole, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         y = self._yoffset
         painter.setBrush(self.__brush)
         painter.setPen(self.__pen)
@@ -206,6 +197,7 @@ class UINote_Whole(UINote):
 
 
 class UINote_Half(UINote):
+    """A half note."""
 
     _length = 2.0
 
@@ -214,9 +206,11 @@ class UINote_Half(UINote):
     __brush = QtGui.QBrush(Qt.NoBrush)
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Half, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         y = self._yoffset
         painter.setBrush(self.__brush)
         painter.setPen(self.__pen)
@@ -237,18 +231,22 @@ class UINote_Half(UINote):
 
 
 class UINote_Half_Dotted(UINote_Half):
+    """A dotted half note."""
 
     _length = 3.0
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Half_Dotted, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         super(UINote_Half_Dotted, self).paint(painter, option, widget)
         self._paintDot(painter, option, widget)
 
 
 class UINote_Quarter(UINote):
+    """A quarter note."""
 
     _length = 1.0
 
@@ -257,9 +255,11 @@ class UINote_Quarter(UINote):
     __brush = QtGui.QBrush(Qt.SolidPattern)
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Quarter, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         y = self._yoffset
         painter.setBrush(self.__brush)
         painter.setPen(self.__pen)
@@ -280,18 +280,22 @@ class UINote_Quarter(UINote):
 
 
 class UINote_Quarter_Dotted(UINote_Quarter):
+    """A dotted quarter note."""
 
     _length = 1.5
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Quarter_Dotted, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         super(UINote_Quarter_Dotted, self).paint(painter, option, widget)
         self._paintDot(painter, option, widget)
 
 
 class UINote_Eighth(UINote):
+    """An 8th note."""
 
     _length = 0.5
 
@@ -301,9 +305,11 @@ class UINote_Eighth(UINote):
     __stemBrush = QtGui.QBrush(Qt.NoBrush)
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Eighth, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         y = self._yoffset
         painter.setBrush(self.__brush)
         painter.setPen(self.__pen)
@@ -328,18 +334,22 @@ class UINote_Eighth(UINote):
 
 
 class UINote_Eighth_Dotted(UINote_Eighth):
+    """A dotted 8th note."""
 
     _length = 0.75
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_Eighth_Dotted, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         super(UINote_Eighth_Dotted, self).paint(painter, option, widget)
         self._paintDot(painter, option, widget)
 
 
 class UINote_16th(UINote):
+    """A 16th note."""
 
     _length = 0.25
 
@@ -349,9 +359,11 @@ class UINote_16th(UINote):
     __stemBrush = QtGui.QBrush(Qt.NoBrush)
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_16th, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         y = self._yoffset
         painter.setBrush(self.__brush)
         painter.setPen(self.__pen)
@@ -382,12 +394,15 @@ class UINote_16th(UINote):
 
 
 class UINote_16th_Dotted(UINote_16th):
+    """A dotted 16th note."""
 
     _length = 0.375
 
     def __init__(self, *args, **kwargs):
+        """Initialize the note."""
         super(UINote_16th_Dotted, self).__init__(*args, **kwargs)
 
     def paint(self, painter, option, widget):
+        """Paint the note."""
         super(UINote_16th_Dotted, self).paint(painter, option, widget)
         self._paintDot(painter, option, widget)

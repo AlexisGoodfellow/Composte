@@ -14,6 +14,8 @@ DEBUG = True
 
 
 class SyntaxError(Exception):
+    """Syntax error in REPL."""
+
     pass
 
 
@@ -24,18 +26,18 @@ def I_dont_know_what_you_want_me_to_do(*args):
 
 def _sleep(seconds):
     """
-    sleep seconds
+    Sleep for some number of seconds.
 
-    Sleep for some number of seconds
+    sleep seconds
     """
     time.sleep(int(seconds))
 
 
 def _slice(start, stop, string):
     """
-    slice start-index end-index string
+    Extract a substring from a string.
 
-    Extract a substring from a string
+    slice start-index end-index string
     """
     string = str(string)
     start = None if start == ":" else int(start)
@@ -56,10 +58,9 @@ hard_store = ".repl_vars"
 
 def _export(name, value):
     """
-    export name value
+    Export durable variable name with given value. Persists across repl invocations.
 
-    Export durable variable name with given value. Persists across repl
-    invocations
+    export name value
     """
     try:
         with open(hard_store, "r") as f:
@@ -79,9 +80,9 @@ def _export(name, value):
 
 def _import(name):
     """
-    import name
+    Import durable variable from previous repl sessions.
 
-    Import durable variable from previous repl sessions
+    import name
     """
     try:
         with open(hard_store, "r") as f:
@@ -98,9 +99,9 @@ def _import(name):
 
 def echo(*args):
     """
-    echo [args...]
+    Print all arguments.
 
-    Prints its arguments
+    echo [args...]
     """
     args = [str(arg) for arg in args]
     if DEBUG:
@@ -120,22 +121,23 @@ class REPL_env:
     """
 
     def __init__(self):
+        """Initialize the dictionary."""
         self.__bindings = {}
 
     def set(self, name, value):
         """
-        set name value
+        Set a variable called `name` to have value `value`.
 
-        Set a variable called `name` to have value `value`
+        set name value
         """
         self.__bindings[name] = str(value)
         return value
 
     def unset(self, name):
         """
-        unset name
+        Unset the variable called `name`.
 
-        Unset the variable called `name`
+        unset name
         """
         try:
             val = self.__bindings[name]
@@ -146,9 +148,9 @@ class REPL_env:
 
     def get(self, name):
         """
-        get name
+        Get the value of the variable called `name`.
 
-        Get the value of the variable called `name`
+        get name
         """
         try:
             return self.__bindings[name]
@@ -157,18 +159,20 @@ class REPL_env:
 
 
 class repl_source:
+    """Source of the REPL."""
+
     __max_depth = 500
 
     def __init__(self, prompt):
+        """Initialize the REPL."""
         self.__fps = []
         self.__prompt = prompt
 
     def source(self, filename):
         """
-        source script
+        Read the script file and interpret each line as a command to evaluate.
 
-        Source a script. Read the script file and interpret each line as a
-        command to evaluate.
+        source script
         """
         if len(self.__fps) > self.__max_depth:
             return "source: max depth ({}) exceeded: not sourcing {}".format(
@@ -186,10 +190,9 @@ class repl_source:
 
     def read(self):
         """
-        read
+        Get the next line of input from the sourced file/standard input.
 
-        Get the next line of input from either the current sourced file or
-        from standard input
+        read
         """
         if not self.__fps:
             s = input(self.__prompt()).lstrip()
@@ -210,9 +213,9 @@ class repl_source:
 
 def stop_repl_help(*args):
     """
-    Stop-REPL
+    End this REPL session.
 
-    End this REPL session
+    Stop-REPL
     """
     # Exists to provide help for a REPL builtin
     pass
@@ -220,9 +223,9 @@ def stop_repl_help(*args):
 
 def last_help(*args):
     """
-    last
+    Show the result of the most recently run command.
 
-    Show the result of the most recently run command
+    last
     """
     # Exists to provide help for a REPL builtin
     pass
@@ -230,24 +233,22 @@ def last_help(*args):
 
 def alias_help(*args):
     """
-    alias oldname newname
+    Introduce newname as an alias for oldname.
 
-    Introduce newname as an alias for oldname
+    alias oldname newname
     """
     pass
 
 
 def show_help(builtins, callbacks, fun=None, *args):
     """
-    help [command]
-
-    Display help about `command`
+    Display help about `command`.
 
     External commands take precedence over builtins
-    Commands prefixed with a backslash will check builtins before external
-    commands
-    """
+    Commands prefixed with a backslash will check builtins before external commands
 
+    help [command]
+    """
     # Top level help
     if fun is None:
         fnames = callbacks.keys()
@@ -282,9 +283,7 @@ Display help about `command`. The following commands are available:
 
 
 def merge_args(args):
-    """
-    Merge arguments separated by escaped whitespace
-    """
+    """Merge arguments separated by escaped whitespace."""
     new_args = []
 
     skip = 0
@@ -320,8 +319,7 @@ def merge_args(args):
 
 def expand_vars(env, args):
     """
-    Expand variables to their contents. Unset variables expand to the empty
-    string.
+    Expand variables to their contents. Unset variables expand to the empty string.
 
     For example, if the variable `hello` is set to the value "world", then
     `$hello` will be expanded to "world"
@@ -337,6 +335,7 @@ def expand_vars(env, args):
 
 
 def split_args(args):
+    """Split arguments to the REPL."""
     new_args = []
 
     for arg in args:
@@ -357,9 +356,7 @@ def split_args(args):
 
 
 def quote(args):
-    """
-    Quote whitespace in arguments by escaping whitespace
-    """
+    """Quote whitespace in arguments by escaping whitespace."""
     new_args = []
 
     for arg in args:
@@ -377,12 +374,12 @@ def do_sub_repl_if_needed(
     args=None,
 ):
     """
-    Perform command substitution if necessary. `command args` will be replaced
-    with the output of evaluating `command args`.
+    Perform command substitution if necessary.
+
+    `command args` will be replaced with the output of evaluating `command args`.
 
     For example, echo `echo a` prints a
     """
-
     if args is None:
         return ""
 
@@ -453,12 +450,12 @@ def the_worst_repl_you_will_ever_see(
     setup=[],
 ):
     """
-    Start an interactive REPL backed by callbacks
+    Start an interactive REPL backed by callbacks.
+
     { command-name: function-to-invoke }
     REPL commands have the form COMMAND [ARGUMENTS], splitting on whitespace
     %% begins a linewise comment
     """
-
     env = REPL_env()
     cin = repl_source(prompt)
 
@@ -495,9 +492,9 @@ def the_worst_repl_you_will_ever_see(
                 read = read.split("%%", 1)[0]
                 if read == "":
                     continue
-            except KeyboardInterrupt as e:
+            except KeyboardInterrupt:
                 break
-            except EOFError as e:
+            except EOFError:
                 break
         elif to_eval is None:
             read = setup.pop(0)
@@ -539,9 +536,9 @@ def the_worst_repl_you_will_ever_see(
             # Forgive me
             def alias(oldname, newname):
                 """
-                alias oldname newname
+                Introduce newname as an alias for oldname.
 
-                Introduce newname as an alias for oldname
+                alias oldname newname
                 """
                 if newname in callbacks:
                     return "no-override"

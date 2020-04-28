@@ -43,13 +43,15 @@ class ComposteServer:
         data_root="data/",
     ):
         """
-        Start a Composte Server listening on interactive_port and broadcasting
-        on broadcast_port. Logs are directed to logger, messages are
-        transparently encrypted with encryption_scheme.encrypt() and
-        encryption_scheme.decrypt(), and data is stored in the directory
-        data_root.
-        """
+        Initialize a Composte Server.
 
+        The server:
+        - Listens on interactive_port and broadcasts on broadcast_port
+        - Directs logs to logger
+        - Transparently encrypts with encryption_scheme.encrypt()
+        - Transparently decrypts encryption_scheme.decrypt()
+        - Stores data in the directory data_root.
+        """
         self.__server = NetworkServer(
             interactive_port, broadcast_port, logger, encryption_scheme
         )
@@ -266,7 +268,6 @@ class ComposteServer:
         Ideally we want them in a database, but that's work. Either way, we
         hide the true locations of projects inside of this function.
         """
-
         owner = self.__projects.get(pid).owner
 
         filename = pid + self.__metadata_extension
@@ -328,7 +329,6 @@ class ComposteServer:
 
         Defer to musicWrapper.performMusicFun
         """
-
         # Use this function to get a project
         pid_ = None
 
@@ -344,7 +344,7 @@ class ComposteServer:
             try:
                 # We still need to provide a way to get the project
                 reply = musicWrapper.performMusicFun(*args, fetchProject=get_fun)
-            except:
+            except Exception:
                 print(traceback.format_exc())
                 return ("fail", "Internal Server Error")
             return reply
@@ -408,7 +408,6 @@ class ComposteServer:
 
     def share(self, pid, new_contributor):
         """Add a new user to the list of contributors to a project."""
-
         contributors = self.__contributors.get(project_id=pid)
         user = self.__users.get(new_contributor)
 
@@ -461,7 +460,7 @@ class ComposteServer:
             (status, other) = do_rpc(*rpc["args"])
         except GenericError:
             return ("fail", "Internal server error")
-        except:
+        except Exception:
             self.__server.error(traceback.format_exc())
             return ("fail", "Internal server error (Developer error)")
 
