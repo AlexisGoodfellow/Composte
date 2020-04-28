@@ -1,3 +1,5 @@
-# Raise an exception on deserialization failure
+"""Composte protocol exceptions."""
+
+
 class DeserializationFailure(Exception):
-    pass
+    """Raise an exception on deserialization failure."""

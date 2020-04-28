@@ -1,14 +1,17 @@
+"""Composte network exceptions."""
+
+
 class ComposteBaseException(Exception):
-    pass
+    """Base exception. Never throw directly."""
 
 
 class DecryptError(ComposteBaseException):
-    pass
+    """Exception for decryption failures."""
 
 
 class EncryptError(ComposteBaseException):
-    pass
+    """Exception for encryption failures."""
 
 
 class GenericError(ComposteBaseException):
-    pass
+    """Catch-all exception."""

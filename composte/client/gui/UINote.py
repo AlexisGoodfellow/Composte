@@ -80,9 +80,7 @@ class UINote(QtWidgets.QGraphicsItem):
         )
 
     def _paintAccidental(self, painter, option, widget):
-        """
-        Draw in accidental marks, if appropriate.
-        """
+        """Draw in accidental marks, if appropriate."""
         y = self._yoffset
         painter.setPen(self.__accidentalPen)
         painter.setBrush(self.__accidentalBrush)

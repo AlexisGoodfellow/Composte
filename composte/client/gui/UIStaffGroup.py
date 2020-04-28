@@ -1,3 +1,6 @@
+"""UI Component for grouping staves."""
+from typing import List
+
 from PyQt5 import QtCore, QtWidgets
 
 import client.gui.UISettings as UISet
@@ -5,14 +8,14 @@ from client.gui.UIStaff import UIStaff
 
 
 class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
+    """A collection of staff lines for multiple parts over some range of measures."""
 
-    """
-    A collection of staff lines representing multiple parts over some range of
-    measures.
-    """
-
-    def __init__(self, canvas, measureLists, startMeasure, endMeasure, *args, **kwargs):
+    def __init__(
+        self, canvas, measureLists, startMeasure: int, endMeasure: int, *args, **kwargs
+    ):
         """
+        Initialize the staff group.
+
         :param canvas: QGraphicsScene being used to manage the score view.
         :param measureLists: A list of lists of measures, each containing at
             least endMeasure measures.
@@ -32,31 +35,28 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
         self.__endMeasure = endMeasure
 
         # List containing the staff lines for each part
-        self.__staves = []
+        self.__staves: List[UIStaff] = []
         # Update and redraw everything
         self.refresh()
 
     def length(self):
         """
-        Return the time length of this staff group, i.e. the time between the
-        first beat of this line and the first beat of the next one.
+        Return the time length of this staff group.
+
+        Equivalent to the time between the first beat of this line and
+        the first beat of the next one.
         """
         if not self.__staves:
             return 0
         return self.__staves[0].length()
 
-    def refresh(self):
-        """
-        Recreate the staves based on the measure list, and re-space them to
-        reflect new notes, etc.
-        """
+    def refresh(self) -> None:
+        """Recreate and re-space the staves based on the measure list."""
         self.__updateStaves()
         self.__updatePositions()
 
-    def __updateStaves(self):
-        """
-        Recreate all staves to reflect changes in the measure lists.
-        """
+    def __updateStaves(self) -> None:
+        """Recreate all staves to reflect changes in the measure lists."""
         for s in self.__staves:
             self.__canvas.removeItem(s)
         self.__staves = [
@@ -64,10 +64,8 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
             for ml in self.__measureLists
         ]
 
-    def __updatePositions(self):
-        """
-        Move staff lines around to be appropriately spaced.
-        """
+    def __updatePositions(self) -> None:
+        """Move staff lines around to be appropriately spaced."""
         y_offset = 0
         for s in self.__staves:
             y = s.boundingRect().y()
@@ -77,8 +75,9 @@ class UIStaffGroup(QtWidgets.QGraphicsItemGroup):
 
     def boundingRect(self):
         """
-        Return a QRectF giving the boundaries of the object being drawn; used in
-        score layout, and by Qt for calculating redraws.
+        Return a QRectF giving the boundaries of the object being drawn.
+
+        Used in score layout, and by Qt for calculating redraws.
 
         :returns: A QRectF which contains everything drawn by this staff group.
         """

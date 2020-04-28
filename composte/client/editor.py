@@ -1,6 +1,7 @@
+"""GUI editor for composte."""
 import music21
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 
 import ComposteClient
 from client.gui import UIClef, UIKeySignature, UINote, UITimeSignature
@@ -8,12 +9,9 @@ from client.gui.UIScoreViewport import UIScoreViewport
 
 
 class Editor(QtWidgets.QMainWindow):
+    """The main GUI for editing Composte projects."""
 
-    """
-    The main GUI for editing Composte projects.
-    """
-
-    ## For looking up note types from commands in the debug console.
+    # For looking up note types from commands in the debug console.
     __noteTypeLookup = {
         "whole": UINote.UINote_Whole,
         "half": UINote.UINote_Half,
@@ -48,8 +46,7 @@ class Editor(QtWidgets.QMainWindow):
 
     def update(self, startOffset: float, endOffset: float):
         """
-        Update a section of the score on the UI from the copy held by the
-        client.
+        Update a section of the score on the UI from the copy held by the client.
 
         :note: Updating sections is not currently supported; all updates redraw
         the entire score.
@@ -59,23 +56,18 @@ class Editor(QtWidgets.QMainWindow):
         :param startOffset: Quarter-note offset after the last one to be
             updated.  If None, update through end of project.
         """
-        ## FIXME: Updating of specific sections not working quite yet.
+        # FIXME: Updating of specific sections not working quite yet.
         try:
             self.__ui_scoreViewport.update(self.__client.project(), None, None)
         except ValueError as e:
             self.__debugConsoleWrite(str(e))
 
     def __resetAll(self):
-        """
-        Reload the entire project from the Composte client, and redraw
-        everything.
-        """
+        """Reload the entire project from the Composte client and redraw everything."""
         self.update(None, None)
 
     def __makeUI(self):
-        """
-        Construct the main UI.
-        """
+        """Construct the main UI."""
         self.__ui_mainSplitter = QtWidgets.QSplitter(Qt.Vertical, self)
 
         self.__ui_scoreViewport = UIScoreViewport(parent=self.__ui_mainSplitter)
@@ -116,9 +108,7 @@ class Editor(QtWidgets.QMainWindow):
         self.__makeToolbar()
 
     def __makeMenuBar(self):
-        """
-        Construct the menu bar.
-        """
+        """Construct the menu bar."""
         self.__ui_filemenu = QtWidgets.QMenu("File", parent=self)
         self.__ui_editmenu = QtWidgets.QMenu("Edit", parent=self)
 
@@ -144,9 +134,7 @@ class Editor(QtWidgets.QMainWindow):
         self.setMenuBar(self.__ui_menubar)
 
     def closeEvent(self, ev):
-        """
-        Gracefully disconnect from the Composte client and exit.
-        """
+        """Gracefully disconnect from the Composte client and exit."""
         # Tell the client we are disconnecting
         self.__client.closeEditor()
         # Remove the reference loop between the client and the editor, to avoid
@@ -163,21 +151,15 @@ class Editor(QtWidgets.QMainWindow):
         pass
 
     def printChatMessage(self, msg):
-        """
-        Display a chat message to the debug console.
-        """
+        """Display a chat message to the debug console."""
         self.__debugConsoleWrite(msg)
 
     def __debugConsoleWrite(self, msg):
-        """
-        Display a message in the debug console.
-        """
+        """Display a message in the debug console."""
         self.__ui_debugConsole_log.append(msg)
 
     def __toggleDebug(self):
-        """
-        Show/hide the debug console.
-        """
+        """Show/hide the debug console."""
         self.__ui_debugConsole_layoutWidget.setVisible(
             self.__ui_act_debugConsole.isChecked()
         )
@@ -240,22 +222,19 @@ class Editor(QtWidgets.QMainWindow):
             self.__debugConsoleWrite(msg)
 
     def __handleAddPart(self, clef):
-        """
-        Insert a new part. Not currently implemented.
-        """
+        """Insert a new part. Not currently implemented."""
         raise NotImplementedError
 
     def __handlePlay(self, part=0):
-        """
-        Tell the Composte client to play back the given part.
-        """
+        """Tell the Composte client to play back the given part."""
         self.__client.playback(part)
 
     def __handleAddLine(self):
         """
-        Add a line to the display.  Now largely unused, as the display will
-        expand automatically when notes are added.  Purely a local change, which
-        does not affect the actual score at all.
+        Add a line to the display.
+
+        Now largely unused - the display expands automatically when notes are added.
+        Purely a local change, which does not affect the actual score at all.
         """
         self.__ui_scoreViewport.addLine()
 
@@ -305,21 +284,15 @@ class Editor(QtWidgets.QMainWindow):
         self.__client.chat(self.__client.project().projectID, name, msg)
 
     def __handleTTSon(self):
-        """
-        Tell the Composte client to enable text-to-speech, if available.
-        """
+        """Tell the Composte client to enable text-to-speech, if available."""
         self.__client.ttsOn()
 
     def __handleTTSoff(self):
-        """
-        Tell the Composte client to disable text-to-speech.
-        """
+        """Tell the Composte client to disable text-to-speech."""
         self.__client.ttsOff()
 
     def __processDebugInput(self):
-        """
-        Handle a line of input from the debug console.
-        """
+        """Handle a line of input from the debug console."""
         text = self.__ui_debugConsole_input.text()
         self.__ui_debugConsole_input.clear()
         if not text:
@@ -362,7 +335,7 @@ class Editor(QtWidgets.QMainWindow):
                 self.__handlePlay(partIdx)
             else:
                 self.__debugConsoleHelp("play")
-        ## NOT CURRENTLY SUPPORTED
+        # NOT CURRENTLY SUPPORTED
         # elif cmd in ['addpart']:
         #     self.__handleAddPart(self.__defaultClef)
         elif cmd in ["addline"]:
