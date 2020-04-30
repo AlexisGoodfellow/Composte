@@ -366,4 +366,3 @@ class Editor(QtWidgets.QMainWindow):
             self.__handleDeleteNote(partIdx, pitch, offset)
         else:
             self.__debugConsoleHelp()
-

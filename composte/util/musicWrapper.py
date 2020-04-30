@@ -7,7 +7,7 @@ determined before these functions are called.
 """
 
 import json
-from typing import Callable, List, Optional, Tuple, Any
+from typing import Any, Callable, List, Optional, Tuple
 
 import music21
 
@@ -44,6 +44,7 @@ def handle_bad_offset(offset: Optional[str]) -> None:
 
 
 def update_project(unpacked: Tuple[Callable, List[Any]]) -> List[float]:
+    """Make an update to the project."""
     function, arguments = unpacked
     try:
         return function(*arguments)

@@ -27,7 +27,7 @@ DEBUG_MESSAGES = {
     ),
     "ttsoff": "ttsoff       --  Disable text-to-speech for chat messages.",
     "ttson": "ttson         --  Enable text-to-speech for chat messages.",
-    "clear": "clear         --  Clear the debug console history"
+    "clear": "clear         --  Clear the debug console history",
 }
 
 
@@ -67,4 +67,3 @@ def MUSIC_FUN_LOOKUP_TABLE(musicObject, args):
         "removeDynamic": (musicFuns.removeDynamic, [float(args[0]), musicObject]),
         "addLyric": (musicFuns.addLyric, [float(args[0]), musicObject, args[2]]),
     }
-
