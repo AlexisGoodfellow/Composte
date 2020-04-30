@@ -35,10 +35,10 @@ jobs:
           command: |
             pytest tests --cov-report html | tee ${TEST_RESULTS}/pytest.out
 
-      # - run:
-      #     name: bandit
-      #     command: |
-      #       bandit -r . | tee ${TEST_RESULTS}/bandit.out
+      - run:
+          name: bandit
+          command: |
+            bandit -r . | tee ${TEST_RESULTS}/bandit.out
 
       - run:
           name: black

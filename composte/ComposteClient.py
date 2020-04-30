@@ -3,7 +3,7 @@
 
 import json
 import shlex
-import subprocess
+import subprocess  # nosec
 import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -65,10 +65,10 @@ class ComposteClient(QtCore.QObject):
 
         self.__tts = False
 
-        espeak = subprocess.check_output(
+        espeak = subprocess.check_output(  # nosec
             "which espeak | cat -", stderr=subprocess.DEVNULL, shell=True
         )
-        say = subprocess.check_output(
+        say = subprocess.check_output(  # nosec
             "which say | cat -", stderr=subprocess.DEVNULL, shell=True
         )
         if espeak.decode() != "":
@@ -115,7 +115,7 @@ class ComposteClient(QtCore.QObject):
         print(printedStr)
         self._chatToGUI.emit(printedStr)
         if self.__tts and (self.__ttsCommand is not None):
-            subprocess.call(
+            subprocess.call(  # nosec
                 str(self.__ttsCommand) + spokenStr,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,

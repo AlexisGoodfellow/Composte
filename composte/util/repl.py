@@ -195,7 +195,7 @@ class repl_source:
         read
         """
         if not self.__fps:
-            s = input(self.__prompt()).lstrip()
+            s = input(self.__prompt()).lstrip()  # nosec
 
         else:
             s = self.__fps[-1].readline().strip()

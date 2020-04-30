@@ -241,28 +241,3 @@ class Contributors:
             )
             projects = self.__cursor.fetchall()
             return [Project(*project) for project in projects]
-
-
-if __name__ == "__main__":
-    import os
-
-    try:
-        os.remove("composte.db")
-    except Exception:
-        pass
-
-    auth = Auth("compose.db")
-    proj = Projects("composte.db")
-    own = Contributors("composte.db")
-
-    auth.put("shark meldon", "there", "hello@composte.me")
-    auth.put("save me", "whee", "saveme@composte.me")
-
-    id_1 = uuid.uuid4()
-    id_2 = uuid.uuid4()
-
-    proj.put(id_1, "a", "save me")
-    proj.put(id_2, "b", "shark meldon")
-
-    own.put("shark meldon", id_1)
-    own.put("shark meldon", id_2)
