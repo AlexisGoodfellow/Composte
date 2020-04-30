@@ -14,7 +14,7 @@ class Pool:
         """Initialize the pool."""
         pass
 
-    def put(self, tag, contructor):
+    def put(self, tag, constructor=None):
         """Put into the pool."""
         have = Pool.__objects.get(tag, None)
 

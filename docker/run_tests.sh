@@ -11,7 +11,7 @@ echo "Starting Black..."
 black --quiet composte tests
 
 echo "Starting flake8..."
-# flake8 composte tests
+flake8 composte tests
 
 echo "Starting bandit..."
 # bandit -r composte

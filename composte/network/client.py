@@ -128,6 +128,27 @@ class Client(Loggable):
         """Resume background actions by releasing lock."""
         self.__background_lock.release()
 
+    def __message_flow(
+        self, msg: str, handler: Callable, preprocess: Callable = lambda x: x
+    ):
+        try:
+            msg = self.__translator.decrypt(msg)
+        except DecryptError:
+            self.error(f"Failed to decrypt {msg}")
+            return
+
+        try:
+            msg = preprocess(msg)
+        except GenericError:
+            self.error(f"Failed to preprocess {msg}")
+            return
+
+        try:
+            handler(self, msg)
+        except GenericError:
+            self.error(f"Failure when handling {msg}")
+            return
+
     def __listen_almost_forever(
         self,
         handler: Callable,
@@ -149,24 +170,7 @@ class Client(Loggable):
                 msg = self.__listener.recv(poll_timeout)
                 if msg is None:
                     continue
-
-                try:
-                    msg = self.__translator.decrypt(msg)
-                except DecryptError:
-                    self.error(f"Failed to decrypt {msg}")
-                    continue
-
-                try:
-                    msg = preprocess(msg)
-                except GenericError:
-                    self.error(f"Failed to preprocess {msg}")
-                    continue
-
-                try:
-                    handler(self, msg)
-                except GenericError:
-                    self.error(f"Failure when handling {msg}")
-                    continue
+                self.__message_flow(msg, handler, preprocess)
 
         self.__listener.stop()
 
@@ -232,3 +236,4 @@ if __name__ == "__main__":
     # Stop the clients
     s1.stop()
     s2.stop()
+

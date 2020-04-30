@@ -45,10 +45,10 @@ jobs:
           command: |
             black --check composte tests | tee ${TEST_RESULTS}/black.out
 
-      # - run:
-      #     name: flake8
-      #     command: |
-      #       flake8 . | tee ${TEST_RESULTS}/flake8.out
+      - run:
+          name: flake8
+          command: |
+            flake8 . | tee ${TEST_RESULTS}/flake8.out
 
       - run:
           name: isort
