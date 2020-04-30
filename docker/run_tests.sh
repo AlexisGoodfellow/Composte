@@ -14,7 +14,7 @@ echo "Starting flake8..."
 flake8 composte tests
 
 echo "Starting bandit..."
-# bandit -r composte
+bandit -r composte
 
 echo "Starting import sorting..."
 isort --recursive --apply composte tests
