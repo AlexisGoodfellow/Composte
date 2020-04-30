@@ -47,7 +47,7 @@ class UIScoreViewport(QtWidgets.QGraphicsView):
         self.__scoreScene.setBackgroundBrush(QtGui.QBrush(UISet.BG_COLOR))
         self.setScene(self.__scoreScene)
 
-    def update(self, project, startOffset: float, endOffset: float) -> None:
+    def update(self, project, startOffset: float, endOffset: float) -> None:  # noqa
         """
         Update the region of the score between startOffset and endOffset.
 

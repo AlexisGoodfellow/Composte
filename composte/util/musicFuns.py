@@ -237,6 +237,58 @@ def updateTieStatus(offset, part, noteName):
     return [offset, offset]
 
 
+def add_ties(first_note: music21.note.Note, second_note: music21.note.Note) -> None:
+    """Add ties to a pair of notes if necessary."""
+    if first_note.tie is None and second_note.tie is None:
+        first_note.tiePartners[1] = second_note.offset
+        second_note.tiePartners[0] = first_note.offset
+        first_note.tie = music21.tie.Tie("start")
+        second_note.tie = music21.tie.Tie("stop")
+    elif first_note.tie.type == "stop" and second_note.tie is None:
+        first_note.tiePartners[1] = second_note.offset
+        second_note.tiePartners[0] = first_note.offset
+        first_note.tie.type = "continue"
+        second_note.tie = music21.tie.Tie("stop")
+    elif first_note.tie is None and second_note.tie.type == "start":
+        first_note.tiePartners[1] = second_note.offset
+        second_note.tiePartners[0] = first_note.offset
+        first_note.tie = music21.tie.Tie("start")
+        second_note.tie.type = "continue"
+    elif first_note.tie.type == "stop" and second_note.tie.type == "start":
+        first_note.tiePartners[1] = second_note.offset
+        second_note.tiePartners[0] = first_note.offset
+        first_note.tie.type = "continue"
+        second_note.tie.type = "continue"
+    else:
+        pass
+
+
+def remove_ties(first_note: music21.note.Note, second_note: music21.note.Note) -> None:
+    """Remove ties from a pair of notes."""
+    if first_note.tie.type == "start" and second_note.tie.type == "stop":
+        first_note.tiePartners[1] = None
+        second_note.tiePartners[0] = None
+        first_note.tie = None
+        second_note.tie = None
+    elif first_note.tie.type == "start" and second_note.tie.type == "continue":
+        first_note.tiePartners[1] = None
+        second_note.tiePartners[0] = None
+        first_note.tie = None
+        second_note.tie.type = "start"
+    elif first_note.tie.type == "continue" and second_note.tie.type == "continue":
+        first_note.tiePartners[1] = None
+        second_note.tiePartners[0] = None
+        first_note.tie.type = "stop"
+        second_note.tie.type = "start"
+    elif first_note.tie.type == "continue" and second_note.tie.type == "stop":
+        first_note.tiePartners[1] = None
+        second_note.tiePartners[0] = None
+        first_note.tie.type = "stop"
+        second_note.tie = None
+    else:
+        pass
+
+
 def makeTieUpdate(notes):
     """
     Make an update to how a set of notes are tied together.
@@ -245,52 +297,10 @@ def makeTieUpdate(notes):
     this function ties them together. If ther pair of notes
     passed to this function is tied, the tie is severed.
     """
-    [firstNote, secondNote] = notes
-    # Add Ties
-    if firstNote.tie is None and secondNote.tie is None:
-        firstNote.tiePartners[1] = secondNote.offset
-        secondNote.tiePartners[0] = firstNote.offset
-        firstNote.tie = music21.tie.Tie("start")
-        secondNote.tie = music21.tie.Tie("stop")
-    elif firstNote.tie.type == "stop" and secondNote.tie is None:
-        firstNote.tiePartners[1] = secondNote.offset
-        secondNote.tiePartners[0] = firstNote.offset
-        firstNote.tie.type = "continue"
-        secondNote.tie = music21.tie.Tie("stop")
-    elif firstNote.tie is None and secondNote.tie.type == "start":
-        firstNote.tiePartners[1] = secondNote.offset
-        secondNote.tiePartners[0] = firstNote.offset
-        firstNote.tie = music21.tie.Tie("start")
-        secondNote.tie.type = "continue"
-    elif firstNote.tie.type == "stop" and secondNote.tie.type == "start":
-        firstNote.tiePartners[1] = secondNote.offset
-        secondNote.tiePartners[0] = firstNote.offset
-        firstNote.tie.type = "continue"
-        secondNote.tie.type = "continue"
-    # Remove Ties
-    elif firstNote.tie.type == "start" and secondNote.tie.type == "stop":
-        firstNote.tiePartners[1] = None
-        secondNote.tiePartners[0] = None
-        firstNote.tie = None
-        secondNote.tie = None
-    elif firstNote.tie.type == "start" and secondNote.tie.type == "continue":
-        firstNote.tiePartners[1] = None
-        secondNote.tiePartners[0] = None
-        firstNote.tie = None
-        secondNote.tie.type = "start"
-    elif firstNote.tie.type == "continue" and secondNote.tie.type == "continue":
-        firstNote.tiePartners[1] = None
-        secondNote.tiePartners[0] = None
-        firstNote.tie.type = "stop"
-        secondNote.tie.type = "start"
-    elif firstNote.tie.type == "continue" and secondNote.tie.type == "stop":
-        firstNote.tiePartners[1] = None
-        secondNote.tiePartners[0] = None
-        firstNote.tie.type = "stop"
-        secondNote.tie = None
-    # For completeness and defense against race conditions
-    else:
-        pass
+    [first_note, second_note] = notes
+
+    add_ties(first_note, second_note)
+    remove_ties(first_note, second_note)
 
 
 def transpose(part, semitones):

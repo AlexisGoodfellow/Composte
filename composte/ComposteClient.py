@@ -107,6 +107,22 @@ class ComposteClient(QtCore.QObject):
         if self.__editor is not None:
             self._updateGUI.emit(startOffset, endOffset)
 
+    def __handle_chat_message(self, rpc):
+        rpc["args"][2] = json.loads(rpc["args"][2])
+
+        printedStr = rpc["args"][2][0] + ": " + rpc["args"][2][1]
+        spokenStr = shlex.quote(rpc["args"][2][0] + " says " + rpc["args"][2][1])
+        print(printedStr)
+        self._chatToGUI.emit(printedStr)
+        if self.__tts and (self.__ttsCommand is not None):
+            subprocess.call(
+                str(self.__ttsCommand) + spokenStr,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True,
+            )
+        return
+
     def __handle(self, _, rpc):
         def fail(*args):
             return ("fail", "I don't know what you want me to do")
@@ -121,19 +137,7 @@ class ComposteClient(QtCore.QObject):
             return
         f = rpc["fName"]
         if rpc["args"][1] == "chat":
-            rpc["args"][2] = json.loads(rpc["args"][2])
-
-            printedStr = rpc["args"][2][0] + ": " + rpc["args"][2][1]
-            spokenStr = shlex.quote(rpc["args"][2][0] + " says " + rpc["args"][2][1])
-            print(printedStr)
-            self._chatToGUI.emit(printedStr)
-            if self.__tts and (self.__ttsCommand is not None):
-                subprocess.call(
-                    str(self.__ttsCommand) + spokenStr,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    shell=True,
-                )
+            self.__handle_chat_message(rpc)
             return
 
         do_rpc = rpc_funs.get(f, fail)

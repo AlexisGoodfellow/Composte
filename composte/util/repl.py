@@ -361,13 +361,13 @@ def quote(args):
 
     for arg in args:
         bits = arg.split()
-        bobs = "\ ".join(bits)
+        bobs = "\ ".join(bits)  # noqa
         new_args.append(bobs)
 
     return new_args
 
 
-def do_sub_repl_if_needed(
+def do_sub_repl_if_needed(  # noqa
     callbacks,
     default_function=I_dont_know_what_you_want_me_to_do,
     prompt=lambda: ">>> ",
@@ -441,7 +441,7 @@ def do_sub_repl_if_needed(
     return new_args
 
 
-def the_worst_repl_you_will_ever_see(
+def the_worst_repl_you_will_ever_see(  # noqa
     callbacks,
     default_function=I_dont_know_what_you_want_me_to_do,
     prompt=lambda: ">>> ",

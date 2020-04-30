@@ -6,7 +6,7 @@ import signal  # Need signal handlers to properly run as daemon
 import sys
 import traceback
 from threading import Lock, Thread
-from typing import Callable
+from typing import Callable, Optional
 
 import zmq
 
@@ -97,6 +97,57 @@ class Server(Loggable):
         )
         self.__listen_thread.start()
 
+    def __message_handling_flow(
+        self,
+        message: str,
+        handler: Callable = lambda x: x,
+        preprocess: Callable = lambda x: x,
+        postprocess: Callable = lambda msg: msg,
+    ) -> Optional[str]:
+        try:
+            message = self.__translator.decrypt(message)
+        except DecryptError:
+            self.fail(message, "Decryption failure")
+            return None
+
+        try:
+            message = preprocess(message)
+            reply = handler(self, message)
+            reply = postprocess(reply)
+        except GenericError:
+            self.fail(message, "Internal server error")
+            return None
+
+        try:
+            reply = self.__translator.encrypt(reply)
+        except EncryptError:
+            self.fail(message, "Encryption failure")
+            return None
+
+        return reply
+
+    def __create_reply(
+        self,
+        handler: Callable = lambda x: x,
+        preprocess: Callable = lambda x: x,
+        postprocess: Callable = lambda msg: msg,
+    ):
+        message = self.__isocket.recv_string()
+        # Unconditionally catch and ignore _all_ unexpected
+        # exceptions during the invocations of client-provided
+        # functions
+        try:
+            reply = self.__message_handling_flow(
+                message, handler, preprocess, postprocess
+            )
+            if reply:
+                self.__isocket.send_string(reply)
+            else:
+                self.fail(message, "Malformed message")
+        except Exception:
+            self.fail(message, "Malformed message")
+            self.error(f"Uncaught exception: {traceback.format_exc()}")
+
     def __listen_almost_forever(
         self,
         handler: Callable = lambda x: x,
@@ -119,48 +170,9 @@ class Server(Loggable):
 
                 with self.__ilock:
                     nmsg = self.__isocket.poll(poll_timeout)
-                    if nmsg == 0:
-                        continue
-                    message = self.__isocket.recv_string()
-                    # Unconditionally catch and ignore _all_ unexpected
-                    # exceptions during the invocations of client-provided
-                    # functions
-                    try:
-                        try:
-                            message = self.__translator.decrypt(message)
-                        except DecryptError:
-                            self.fail(message, "Decryption failure")
-                            continue
+                    if nmsg != 0:
+                        self.__create_reply(handler, preprocess, postprocess)
 
-                        try:
-                            message = preprocess(message)
-                        except GenericError:
-                            self.fail(message, "Internal server error")
-                            continue
-
-                        try:
-                            reply = handler(self, message)
-                        except GenericError:
-                            self.fail(message, "Internal server error")
-                            continue
-
-                        try:
-                            reply = postprocess(reply)
-                        except GenericError:
-                            self.fail(message, "Internal server error")
-                            continue
-
-                        try:
-                            reply = self.__translator.encrypt(reply)
-                        except EncryptError:
-                            self.fail(message, "Encryption failure")
-                            continue
-                    except Exception:
-                        self.fail(message, "Malformed message")
-                        self.error(f"Uncaught exception: {traceback.format_exc()}")
-                        continue
-
-                    self.__isocket.send_string(reply)
         except KeyboardInterrupt:
             self.stop()
 

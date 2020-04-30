@@ -7,15 +7,53 @@ determined before these functions are called.
 """
 
 import json
+from typing import Any, Callable, List, Optional, Tuple
 
 import music21
 
+from composte.constants import LEGAL_NOTE_LENGTHS, MUSIC_FUN_LOOKUP_TABLE
 from network.base.exceptions import GenericError
-from util import musicFuns
+
+
+def unpackFun(project, partIndex, fname, args):
+    """
+    Determine which function to call.
+
+    Casts all arguments to the correct types.
+    """
+    try:
+        if partIndex is not None and partIndex != "None":
+            musicObject = project.parts[int(partIndex)]
+        else:
+            musicObject = project.parts
+
+        return (
+            MUSIC_FUN_LOOKUP_TABLE(musicObject, args)[fname]
+            if fname in MUSIC_FUN_LOOKUP_TABLE
+            else (None, None)
+        )
+    except ValueError as e:
+        raise GenericError from e
+
+
+def handle_bad_offset(offset: Optional[str]) -> None:
+    """Handle offsets that are invalid."""
+    if offset is not None and offset != "None":
+        if float(offset) < 0.0:
+            raise GenericError
+
+
+def update_project(unpacked: Tuple[Callable, List[Any]]) -> List[float]:
+    """Make an update to the project."""
+    function, arguments = unpacked
+    try:
+        return function(*arguments)
+    except music21.exceptions21.Music21Exception:
+        raise GenericError
 
 
 def performMusicFun(
-    projectID, fname, args, partIndex=None, offset=None, fetchProject=None
+    project_id, fname, args, partIndex=None, offset=None, fetchProject=None
 ):
     """
     Wrap all music functions.
@@ -25,87 +63,23 @@ def performMusicFun(
     """
     # Fetch the project before anything else
     # for ease of use
-    project = fetchProject(projectID)
+    project = fetchProject(project_id)
     args = json.loads(args)
     if fname == "chat":
         return ("ok", "")  # Why not make a chat server too?
 
-    def unpackFun(fname, args):
-        """
-        Determine which function to call.
-
-        Casts all arguments to the correct types.
-        """
-        try:
-            if partIndex is not None and partIndex != "None":
-                musicObject = project.parts[int(partIndex)]
-            else:
-                musicObject = project.parts
-
-            if fname == "changeKeySignature":
-                return (
-                    musicFuns.changeKeySignature,
-                    [float(args[0]), musicObject, int(args[2])],
-                )
-            elif fname == "insertNote":
-                return (
-                    musicFuns.insertNote,
-                    [float(args[0]), musicObject, args[2], float(args[3])],
-                )
-            elif fname == "removeNote":
-                return (musicFuns.removeNote, [float(args[0]), musicObject, args[2]])
-            elif fname == "insertMetronomeMark":
-                return (
-                    musicFuns.insertMetronomeMark,
-                    [float(args[0]), musicObject, int(args[1])],
-                )
-            elif fname == "removeMetronomeMark":
-                return (musicFuns.removeMetronomeMark, [float(args[0]), musicObject])
-            elif fname == "transpose":
-                return (musicFuns.transpose, [musicObject, int(args[1])])
-            elif fname == "insertClef":
-                return (musicFuns.insertClef, [float(args[0]), musicObject, args[2]])
-            elif fname == "removeClef":
-                return (musicFuns.removeClef, [float(args[0]), musicObject])
-            elif fname == "insertMeasures":
-                return (
-                    musicFuns.insertMeasures,
-                    [float(args[0]), musicObject, float(args[2])],
-                )
-            elif fname == "addInstrument":
-                return (musicFuns.addInstrument, [float(args[0]), musicObject, args[2]])
-            elif fname == "removeInstrument":
-                return (musicFuns.removeInstrument, [float(args[0]), musicObject])
-            elif fname == "addDynamic":
-                return (musicFuns.addDynamic, [float(args[0]), musicObject, args[2]])
-            elif fname == "removeDynamic":
-                return (musicFuns.removeDynamic, [float(args[0]), musicObject])
-            elif fname == "addLyric":
-                return (musicFuns.addLyric, [float(args[0]), musicObject, args[2]])
-            else:
-                return (None, None)
-        except ValueError as e:
-            raise GenericError from e
-
-    (function, arguments) = unpackFun(fname, args)
-    # Begin error handling
-    if (function, arguments) == (None, None):
+    unpacked = unpackFun(project, partIndex, fname, args)
+    if (unpacked[0], unpacked[1]) == (None, None):
         return ("fail", "INVALID OPERATION")
 
-    if offset is not None and offset != "None":
-        if float(offset) < 0.0:
-            raise GenericError
+    handle_bad_offset(offset)
 
     # Last-minute note length validation hack
-    legalLengths = [4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.375, 0.25]
     if fname == "insertNote":
-        if arguments[3] not in legalLengths:
+        if unpacked[1][3] not in LEGAL_NOTE_LENGTHS:
             return ("fail", "INVALID NOTE LENGTH")
 
-    try:
-        updateOffsets = function(*arguments)
-    except music21.exceptions21.Music21Exception:
-        raise GenericError
+    updateOffsets = update_project(unpacked)
 
     # End error handling
     return ("ok", updateOffsets)

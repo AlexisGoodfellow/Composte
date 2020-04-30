@@ -4,8 +4,9 @@ from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
 import ComposteClient
-from client.gui import UIClef, UIKeySignature, UINote, UITimeSignature
-from client.gui.UIScoreViewport import UIScoreViewport
+from composte.client.gui import UIClef, UIKeySignature, UINote, UITimeSignature
+from composte.client.gui.UIScoreViewport import UIScoreViewport
+from composte.constants import DEBUG_MESSAGES
 
 
 class Editor(QtWidgets.QMainWindow):
@@ -179,47 +180,10 @@ class Editor(QtWidgets.QMainWindow):
                 "CMD1 ; CMD2  --  Execute CMD1 followed by CMD2"
             )
             self.__debugConsoleWrite(msg)
-        if fn == "clear" or fn is None:
-            msg = "clear        --  Clear the debug console history"
-            self.__debugConsoleWrite(msg)
-        if fn == "ttson" or fn is None:
-            msg = (
-                "ttson        --  Enable text-to-speech for chat messages, "
-                "if available."
-            )
-            self.__debugConsoleWrite(msg)
-        if fn == "ttsoff" or fn is None:
-            msg = "ttsoff       --  Disable text-to-speech for chat messages."
-            self.__debugConsoleWrite(msg)
-        if fn == "play" or fn is None:
-            msg = (
-                "play/p [PART_INDEX]\n"
-                "    Play back the part specified by the given index, "
-                "or part 0 if none is specified."
-            )
-            self.__debugConsoleWrite(msg)
-        if fn == "chat" or fn is None:
-            msg = (
-                "chat/c MESSAGE\n"
-                "    Send MESSAGE (which may contain spaces, but not "
-                "    semicolons) to all users\n working on the current "
-                "    project"
-            )
-            self.__debugConsoleWrite(msg)
-        if fn == "insert" or fn is None:
-            msg = (
-                "insert/i PART_INDEX PITCH NOTE_TYPE OFFSET\n"
-                "    Insert a NOTE_TYPE into the indicated part, at \n"
-                "    quarter-note-offset OFFSET and with the given PITCH"
-            )
-            self.__debugConsoleWrite(msg)
-        if fn == "delete" or fn is None:
-            msg = (
-                "delete/d PART_INDEX PITCH OFFSET\n"
-                "    Remove the note in the indicated part at\n"
-                "    quarter-note-offset OFFSET and pitch PITCH"
-            )
-            self.__debugConsoleWrite(msg)
+            for message in DEBUG_MESSAGES.values():
+                self.__debugConsoleWrite(msg)
+        else:
+            self.__debugConsoleWrite(DEBUG_MESSAGES[fn])
 
     def __handleAddPart(self, clef):
         """Insert a new part. Not currently implemented."""
@@ -301,7 +265,7 @@ class Editor(QtWidgets.QMainWindow):
         for cmdstr in cmdstrs:
             self.__processDebugCommand(cmdstr)
 
-    def __processDebugCommand(self, cmdstr):
+    def __processDebugCommand(self, cmdstr):  # noqa
         """
         Handle a single command from the debug console.
 
